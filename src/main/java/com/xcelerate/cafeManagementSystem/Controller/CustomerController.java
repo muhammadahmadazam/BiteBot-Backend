@@ -21,6 +21,7 @@ public class CustomerController {
     @PostMapping("/create")
     public ResponseEntity<Customer> createUser(@RequestBody Customer c) {
         Customer createdCustomer = customerService.saveUser(c);
+        System.out.println("Testing...");
         return new ResponseEntity<>(createdCustomer, HttpStatus.CREATED);
     }
 
