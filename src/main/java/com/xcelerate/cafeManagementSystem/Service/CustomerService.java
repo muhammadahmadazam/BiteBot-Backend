@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.xcelerate.cafeManagementSystem.Model.Customer;
 import com.xcelerate.cafeManagementSystem.Repository.CustomerRepository;
+import com.xcelerate.cafeManagementSystem.Utils.PasswordUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import jakarta.transaction.Transactional;
@@ -19,8 +20,10 @@ public class CustomerService {
         this.customerRepository = customerRepository;
     }
 
-    public Customer saveUser(Customer c) {
-        return customerRepository.save(c);
+    public Customer createUser(String email, String password, String name, String phone) {
+        String hashPassword = PasswordUtil.hashPassword(password);
+        Customer customer = new Customer(email, hashPassword, name, phone);
+        return customerRepository.save(customer);
     }
 
 }
