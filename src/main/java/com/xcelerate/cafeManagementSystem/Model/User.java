@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 
 @MappedSuperclass
 public class User {
-
+    @Column(unique = true)
     protected String email;
     protected String password;
 

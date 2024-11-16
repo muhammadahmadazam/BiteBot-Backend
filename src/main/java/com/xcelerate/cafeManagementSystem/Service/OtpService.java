@@ -20,7 +20,7 @@ public class OtpService {
 
     private static final int OTP_VALID_DURATION = 5; // OTP validity duration in minutes
 
-    public CompletableFuture<Void> generateAndSendOtp(String email) {
+    public boolean generateAndSendOtp(String email) {
         String otp = generateOtp();
         String subject = "Your OTP Code";
         String text = "Your OTP code is: " + otp;
@@ -29,7 +29,13 @@ public class OtpService {
         cacheManager.getCache("otpCache").put(email, new OtpDetails(otp, LocalDateTime.now().plusMinutes(OTP_VALID_DURATION)));
 
         // Send OTP email
-        return emailService.sendEmail(email, subject, text);
+        try{
+            emailService.sendEmail(subject, text, email);
+            return true;
+        }
+        catch (Exception e){
+            return false;
+        }
     }
 
     private String generateOtp() {

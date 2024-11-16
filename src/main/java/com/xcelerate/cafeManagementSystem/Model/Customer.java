@@ -12,6 +12,10 @@ public class Customer extends User {
     private String Phone;
     private boolean Verified;
 
+    public Customer() {
+        super("", "");
+    }
+
     public Customer(String email, String password, String name, String phone) {
         super(email, password);
         this.name = name;
