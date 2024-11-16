@@ -2,11 +2,9 @@ package com.xcelerate.cafeManagementSystem.Service;
 
 import java.time.LocalDateTime;
 import java.util.Random;
-import java.util.concurrent.CompletableFuture;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.CacheManager;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -23,17 +21,16 @@ public class OtpService {
     public boolean generateAndSendOtp(String email) {
         String otp = generateOtp();
         String subject = "Your OTP Code";
-        String text = "Your OTP code is: " + otp;
+        String text = "Your OTP code is:  " + otp;
 
         // Store OTP in cache with expiration
         cacheManager.getCache("otpCache").put(email, new OtpDetails(otp, LocalDateTime.now().plusMinutes(OTP_VALID_DURATION)));
 
         // Send OTP email
-        try{
-            emailService.sendEmail(subject, text, email);
+        try {
+            emailService.sendEmail(email, subject, text);
             return true;
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             return false;
         }
     }
@@ -44,11 +41,9 @@ public class OtpService {
         return String.valueOf(otp);
     }
 
-    @Cacheable(value = "otpCache", key = "#email")
     public boolean validateOtp(String email, String otp) {
         OtpDetails otpDetails = cacheManager.getCache("otpCache").get(email, OtpDetails.class);
         if (otpDetails != null && otpDetails.getOtp().equals(otp) && otpDetails.getExpirationTime().isAfter(LocalDateTime.now())) {
-
             cacheManager.getCache("otpCache").evict(email); // Remove OTP after successful validation
             return true;
         }
