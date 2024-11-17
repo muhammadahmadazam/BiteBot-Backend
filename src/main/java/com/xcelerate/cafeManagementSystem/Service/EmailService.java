@@ -19,11 +19,11 @@ import java.util.Properties;
 public class EmailService {
 
     @Autowired
-    GmailAuthentication gmailAuthentication;
+    GmailAuthenticationService gmailAuth;
 
     public void sendEmail(String to, String subject, String body) {
         try {
-            Gmail service = gmailAuthentication.getService();
+            Gmail service = gmailAuth.getService();
             MimeMessage email = createEmail(to, "xcelerate.bitebot@gmail.com", subject, body);
             ByteArrayOutputStream buffer = new ByteArrayOutputStream();
             email.writeTo(buffer);
