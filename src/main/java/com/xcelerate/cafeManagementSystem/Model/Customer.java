@@ -3,40 +3,41 @@ package com.xcelerate.cafeManagementSystem.Model;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "Customers")
+@Table(name = "Customer")
 public class Customer extends User {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+
+    @OneToOne
+    @MapsId
+    @JoinColumn(name = "id")
+    private User user;
+
     private String name;
     private String Phone;
-    private boolean Verified;
+    private boolean verified;
 
-    public Customer() {
-        super("", "");
-    }
+    public Customer() {}
 
-    public Customer(String email, String password, String name, String phone) {
-        super(email, password);
+    public Customer(String name, String phone, User user) {
+        this.user = user;
         this.name = name;
         this.Phone = phone;
-        this.Verified = false;
+        this.verified = false;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public User getUser() {
+        return user;
     }
 
     public boolean getVerified() {
-        return Verified;
+        return verified;
     }
 
     public void setVerified(boolean verified) {
-        this.Verified = verified;
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
+        this.verified = verified;
     }
 
     public String getName() {

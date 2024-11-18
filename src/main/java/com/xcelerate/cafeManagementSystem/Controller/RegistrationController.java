@@ -30,10 +30,12 @@ public class RegistrationController {
             @RequestBody CustomerRegistrationDTO customerRegistrationDTO
     ) {
 
+
         String email = customerRegistrationDTO.email;
         String password = customerRegistrationDTO.password;
         String name = customerRegistrationDTO.name;
         String phone = customerRegistrationDTO.phone;
+
 
         // Generate Non Verified User and send OTP
         customerService.createUser(email, password, name, phone);
