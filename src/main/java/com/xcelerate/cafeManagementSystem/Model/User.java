@@ -5,7 +5,8 @@ import jakarta.persistence.*;
 
 
 @Entity
-@Table(name = "User")
+@Inheritance(strategy = InheritanceType.JOINED)
+@Table(name = "users")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -15,6 +16,8 @@ public class User {
     protected String email;
 
     protected String password;
+
+    protected String role;
 
     public User() {
     }

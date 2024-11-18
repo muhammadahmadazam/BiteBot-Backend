@@ -3,13 +3,8 @@ package com.xcelerate.cafeManagementSystem.Model;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "Customer")
+@Table(name = "customers")
 public class Customer extends User {
-
-    @OneToOne
-    @MapsId
-    @JoinColumn(name = "id")
-    private User user;
 
     private String name;
     private String Phone;
@@ -17,20 +12,14 @@ public class Customer extends User {
 
     public Customer() {}
 
-    public Customer(String name, String phone, User user) {
-        this.user = user;
+    public Customer(String name, String phone, String email, String password) {
+        super(email, password);
         this.name = name;
         this.Phone = phone;
         this.verified = false;
     }
 
-    public void setUser(User user) {
-        this.user = user;
-    }
 
-    public User getUser() {
-        return user;
-    }
 
     public boolean getVerified() {
         return verified;
