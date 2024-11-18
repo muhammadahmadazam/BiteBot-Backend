@@ -1,5 +1,6 @@
 package com.xcelerate.cafeManagementSystem.Service;
 
+import com.xcelerate.cafeManagementSystem.Enums.UserRoles;
 import com.xcelerate.cafeManagementSystem.Model.Customer;
 import com.xcelerate.cafeManagementSystem.Model.User;
 import com.xcelerate.cafeManagementSystem.Repository.CustomerRepository;
@@ -30,7 +31,7 @@ public class CustomerService {
     public Customer createUser(String email, String password, String name, String phone) {
         String hashPassword = PasswordUtil.hashPassword(password);
 
-        Customer customer = new Customer(name, phone, email, hashPassword);
+        Customer customer = new Customer(name, phone, email, hashPassword, UserRoles.CUSTOMER);
 
         return customerRepository.save(customer);
     }
@@ -58,14 +59,6 @@ public class CustomerService {
         }
         return customer.getVerified() ? 2 : 1;
     }
-
-//    public boolean loginUser(String email, String password) {
-//        Customer customer = customerRepository.findByEmail(email);
-//        if(customer == null) {
-//            return false;
-//        }
-//        return PasswordUtil.verifyPassword(password, customer.getPassword());
-//    }
 
 }
 

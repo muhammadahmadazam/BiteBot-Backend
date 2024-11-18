@@ -12,8 +12,8 @@ public class Customer extends User {
 
     public Customer() {}
 
-    public Customer(String name, String phone, String email, String password) {
-        super(email, password);
+    public Customer(String name, String phone, String email, String password, String role) {
+        super(email, password, role);
         this.name = name;
         this.Phone = phone;
         this.verified = false;

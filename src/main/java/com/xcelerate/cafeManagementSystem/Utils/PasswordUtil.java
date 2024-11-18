@@ -9,6 +9,12 @@ public class PasswordUtil {
     }
 
     public static boolean checkPassword(String plainPassword, String hashedPassword) {
-        return encoder.matches(plainPassword, hashedPassword);
+        System.out.println("Plain password: " + plainPassword);
+        System.out.println("Hashed password: " + hashedPassword);
+        boolean matches = encoder.matches(plainPassword, hashedPassword);
+        System.out.println("Password matches: " + matches);
+        return matches;
     }
+
+
 }
