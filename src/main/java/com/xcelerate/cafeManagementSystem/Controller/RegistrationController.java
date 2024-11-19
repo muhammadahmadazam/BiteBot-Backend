@@ -1,5 +1,7 @@
 package com.xcelerate.cafeManagementSystem.Controller;
 
+import com.cloudinary.Api;
+import com.xcelerate.cafeManagementSystem.DTOs.ApiResponseDTO;
 import com.xcelerate.cafeManagementSystem.DTOs.CustomerRegistrationDTO;
 import com.xcelerate.cafeManagementSystem.DTOs.CustomerVerificationDTO;
 import com.xcelerate.cafeManagementSystem.DTOs.EmailDTO;
@@ -26,7 +28,7 @@ public class RegistrationController {
     private OtpService otpService;
 
     @PostMapping("/create-account")
-    public ResponseEntity<String> registerUser(
+    public ResponseEntity<ApiResponseDTO<String>> registerUser(
             @RequestBody CustomerRegistrationDTO customerRegistrationDTO
     ) {
 
@@ -43,50 +45,60 @@ public class RegistrationController {
 
 
         if(isOtpSent) {
-            return new ResponseEntity<>("OTP sent to email: " + email, HttpStatus.OK);
+            ApiResponseDTO<String> response = new ApiResponseDTO<>("OTP sent to email: " + email, email);
+            return new ResponseEntity<>(response, HttpStatus.OK);
         }
-        return new ResponseEntity<>("User registered successfully, Error in sending OTP", HttpStatus.OK);
+        ApiResponseDTO<String> response = new ApiResponseDTO<>("Error in sending OTP", email);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @PostMapping("/verify-otp")
-    public ResponseEntity<String> verifyOtp(@RequestBody CustomerVerificationDTO customerVerificationDTO) {
+    public ResponseEntity<ApiResponseDTO<String>> verifyOtp(@RequestBody CustomerVerificationDTO customerVerificationDTO) {
         String email = customerVerificationDTO.email;
         String otp = customerVerificationDTO.otp;
         if(EmailUtil.verifyEmailFormat(email) == false) {
-            return new ResponseEntity<>("Invalid Email", HttpStatus.BAD_REQUEST);
+            ApiResponseDTO<String> response = new ApiResponseDTO<>("Invalid Email", email);
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
 
         }
         if (otpService.validateOtp(email, otp)) {
             customerService.verifyUser(email);
-            return new ResponseEntity<>("OTP verified successfully", HttpStatus.OK);
+            ApiResponseDTO<String> response = new ApiResponseDTO<>("Email verified successfully", email);
+            return new ResponseEntity<>(response, HttpStatus.OK);
         }
-        return new ResponseEntity<>("Invalid OTP", HttpStatus.BAD_REQUEST);
+        ApiResponseDTO<String> response = new ApiResponseDTO<>("Invalid OTP", email);
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
     @PostMapping("/resend-otp")
-    public ResponseEntity<String> resendOtp(@RequestBody EmailDTO emailDTO) {
+    public ResponseEntity<ApiResponseDTO<String>> resendOtp(@RequestBody EmailDTO emailDTO) {
 
         String email = emailDTO.email;
 
         if(EmailUtil.verifyEmailFormat(email) == false) {
-            return new ResponseEntity<>("Invalid Email", HttpStatus.BAD_REQUEST);
+            ApiResponseDTO<String> response = new ApiResponseDTO<>("Invalid Email", email);
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
 
         int isVerifiedStatus = customerService.isCustomerVerified(email);
         // 0 if the customer does not exist, 1 if the customer is not verified, 2 if the customer is verified
 
         if(isVerifiedStatus == 0) {
-            return new ResponseEntity<>("Email does not Exist", HttpStatus.BAD_REQUEST);
+            ApiResponseDTO<String> response = new ApiResponseDTO<>("Email does not exist", email);
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
 
         else if(isVerifiedStatus == 2) {
-            return new ResponseEntity<>("Email is already verified", HttpStatus.BAD_REQUEST);
+            ApiResponseDTO<String> response = new ApiResponseDTO<>("Email is already verified", email);
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
 
         boolean isOtpSent = otpService.generateAndSendOtp(email);
         if(isOtpSent) {
-            return new ResponseEntity<>("OTP resent to email: " + email, HttpStatus.OK);
+            ApiResponseDTO<String> response = new ApiResponseDTO<>("OTP resent to email: " + email, email);
+            return new ResponseEntity<>(response, HttpStatus.OK);
         }
-        return new ResponseEntity<>("Error in sending OTP", HttpStatus.OK);
+        ApiResponseDTO<String> response = new ApiResponseDTO<>("Error in sending OTP", email);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }

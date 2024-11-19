@@ -1,5 +1,6 @@
 package com.xcelerate.cafeManagementSystem.Controller;
 
+import com.xcelerate.cafeManagementSystem.DTOs.ApiResponseDTO;
 import com.xcelerate.cafeManagementSystem.DTOs.LoginDTO;
 import com.xcelerate.cafeManagementSystem.Service.AuthenticationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,16 +19,19 @@ public class AuthenticationController {
     private AuthenticationService authenticationService;
 
     @PostMapping("/login")
-    public ResponseEntity<String> loginUser(
+    public ResponseEntity<ApiResponseDTO<String>> loginUser(
             @RequestBody LoginDTO loginDTO
     ) {
+
         String email = loginDTO.email;
         String password = loginDTO.password;
 
         String token = authenticationService.loginUser(email, password);
         if(token != null) {
-            return new ResponseEntity<>(token, HttpStatus.OK);
+            ApiResponseDTO<String> response = new ApiResponseDTO<>("Login successful", token);
+            return new ResponseEntity<>(response, HttpStatus.OK);
         }
-        return new ResponseEntity<>("Invalid credentials", HttpStatus.UNAUTHORIZED);
+        ApiResponseDTO<String> response = new ApiResponseDTO<>("Invalid credentials", null);
+        return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
     }
 }
