@@ -15,6 +15,8 @@ public class JwtUtil {
 
     private final String SECRET_KEY;
 
+    private final int TOKEN_VALIDITY = 1000 * 60 * 60 * 10;
+
     public JwtUtil(@Value("${jwt.secret}") String secretKey) {
         this.SECRET_KEY = secretKey;
         System.out.println("JWT Secret Key (constructor): " + SECRET_KEY); // Debugging line
@@ -27,6 +29,8 @@ public class JwtUtil {
         }
         return Jwts.builder()
                 .setSubject(email)
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + TOKEN_VALIDITY))
                 .claim("role", role)
                 .claim("id", id)
                 .signWith(SignatureAlgorithm.HS256, SECRET_KEY)
@@ -46,7 +50,13 @@ public class JwtUtil {
     }
 
     private boolean isTokenExpired(String token) {
-        return extractClaims(token).getExpiration().before(new Date());
+        return Jwts.parser()
+                .setSigningKey(SECRET_KEY)
+                .parseClaimsJws(token)
+                .getBody()
+                .getExpiration()
+                .before(new Date());
+
     }
 
 }
