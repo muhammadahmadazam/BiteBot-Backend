@@ -92,6 +92,28 @@ public class ProductService {
             return productDTO;
         }).collect(Collectors.toList());
     }
+
+    public ProductDTO getByProductById(int id) {
+        Optional<Product> product = productRepository.findByIdWithIngredients(id);
+
+        if (product.isPresent()) {
+            ProductDTO productDTO = new ProductDTO();
+            productDTO.setId(product.get().getId());
+            productDTO.setName(product.get().getName());
+            productDTO.setDescription(product.get().getDescription());
+            productDTO.setAvailability(product.get().isAvailability());
+            productDTO.setPrice(product.get().getPrice());
+            productDTO.setCategory(product.get().getCategory());
+            productDTO.setImageLink(product.get().getImageLink());
+            productDTO.setIngredients(product.get().getIngredients().stream()
+                    .map(ingredient -> new ProductDTO.IngredientDTO(ingredient.getId(), ingredient.getName()))
+                    .collect(Collectors.toSet()));
+            return productDTO;
+        }else{
+            return null;
+        }
+    }
+
 }
 
 

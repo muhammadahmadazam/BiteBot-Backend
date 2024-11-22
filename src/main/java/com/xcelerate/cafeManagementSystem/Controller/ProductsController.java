@@ -3,7 +3,6 @@ package com.xcelerate.cafeManagementSystem.Controller;
 
 import com.xcelerate.cafeManagementSystem.DTOs.EmailDTO;
 import com.xcelerate.cafeManagementSystem.DTOs.ProductDTO;
-import com.xcelerate.cafeManagementSystem.DTOs.PromptDTO;
 import com.xcelerate.cafeManagementSystem.Model.Product;
 import com.xcelerate.cafeManagementSystem.Service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,4 +37,13 @@ public class ProductsController {
         return new ResponseEntity<List<ProductDTO>>(products, HttpStatus.OK);
     }
 
+    @GetMapping("/product/get/{id}")
+    public ResponseEntity<ProductDTO> getProductById(@PathVariable int id) {
+        ProductDTO product = productService.getByProductById(id);
+        if (product == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }else{
+            return new ResponseEntity<ProductDTO>(product, HttpStatus.OK);
+        }
+    }
 }
