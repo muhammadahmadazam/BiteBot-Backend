@@ -4,20 +4,24 @@ import com.xcelerate.cafeManagementSystem.Enums.UserRoles;
 import com.xcelerate.cafeManagementSystem.Model.Customer;
 import com.xcelerate.cafeManagementSystem.Model.User;
 import com.xcelerate.cafeManagementSystem.Repository.CustomerRepository;
+import com.xcelerate.cafeManagementSystem.Repository.OrderRepository;
 import com.xcelerate.cafeManagementSystem.Utils.PasswordUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 
 @Service
 public class CustomerService {
     private final CustomerRepository customerRepository;
+    private final OrderRepository orderRepository;
 
 
     @Autowired
-    public CustomerService(CustomerRepository customerRepository) {
+    public CustomerService(CustomerRepository customerRepository, OrderRepository orderRepository) {
         this.customerRepository = customerRepository;
-
+        this.orderRepository = orderRepository;
     }
 
     /*
@@ -60,6 +64,12 @@ public class CustomerService {
         return customer.getVerified() ? 2 : 1;
     }
 
+
+
+    public Customer getCustomerByEmail(String email) {
+        Optional<Customer> customer = customerRepository.findByEmailIgnoreCase(email);
+        return customer.orElse(null);
+    }
 }
 
 

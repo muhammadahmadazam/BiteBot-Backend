@@ -15,7 +15,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/")
-@CrossOrigin(origins = "${frontendURL}")
 public class ProductsController {
 
     @Autowired

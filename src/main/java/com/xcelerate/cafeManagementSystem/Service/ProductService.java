@@ -29,6 +29,7 @@ public class ProductService {
 //            //  CHECK IF ALL INGREDIENTS ARE THERE IN THE TABLE IF NOT INSERT THEM FIRST
             List<Ingredient> newIngredients = new ArrayList<>();
             for (Ingredient i : p.getIngredients()) {
+
                 Optional<Ingredient> ingredient = ingredientRepository.findByName(i.getName());
                 if (ingredient.isEmpty()) {
                         // If it doesn't exist, create a new ingredient
@@ -41,11 +42,18 @@ public class ProductService {
                     newIngredients.add(ingredient.get());
                 }
             }
+            for (Ingredient i : p.getIngredients()) {
+                System.out.println( i.getId() +  " " + i.getName());
+            }
+            for (Ingredient i : newIngredients) {
+                System.out.println( i.getId() +  " " + i.getName());
+            }
             p.setIngredients(new HashSet<>(Arrays.asList(newIngredients.toArray(new Ingredient[0]))));
 //            System.out.println("Ingredients are okay..");
             productRepository.save(p);
             return true;
         }catch (Exception e) {
+            System.out.println(e.getMessage());
             return false;
         }
     }
@@ -93,7 +101,12 @@ public class ProductService {
         }).collect(Collectors.toList());
     }
 
-    public ProductDTO getByProductById(int id) {
+    public Product getProductById(long id) {
+        Optional<Product> p = productRepository.findById(id);
+        return p.orElse(null);
+    }
+
+    public ProductDTO getByProductById(long id) {
         Optional<Product> product = productRepository.findByIdWithIngredients(id);
 
         if (product.isPresent()) {
@@ -113,7 +126,6 @@ public class ProductService {
             return null;
         }
     }
-
 }
 
 

@@ -35,3 +35,4 @@ build/
 
  # Credentials.json
 src/main/resources/credentials.json
+tokens/tokens/StoredCredential
