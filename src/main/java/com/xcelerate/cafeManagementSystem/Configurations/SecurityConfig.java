@@ -39,6 +39,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests()
                 .requestMatchers("/api/auth/**","/api/register/**", "/api/products/get/**")
                 .permitAll()
+                .requestMatchers("/api/recommendation/**")
+                .hasRole("CUSTOMER")
                 .anyRequest()
                 .authenticated()
                 .and()
