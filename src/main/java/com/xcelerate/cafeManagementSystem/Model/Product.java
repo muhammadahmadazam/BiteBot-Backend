@@ -26,6 +26,8 @@ public class Product {
     protected String imageLink;
     @Column(columnDefinition = "TEXT")
     protected String description;
+    @Column(columnDefinition = "TEXT")
+    protected String emotion;
 
 
     @ManyToMany

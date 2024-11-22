@@ -72,6 +72,26 @@ public class ProductService {
         }).collect(Collectors.toList());
 
     }
+
+    public List<ProductDTO> getAllByEmotion(String emotion) {
+        List<Product> products = productRepository.getAllByEmotion(emotion);
+        return products.stream().map(product -> {
+            // Map Product to ProductDTO
+            ProductDTO productDTO = new ProductDTO();
+            productDTO.setId(product.getId());
+            productDTO.setName(product.getName());
+            productDTO.setDescription(product.getDescription());
+            productDTO.setAvailability(product.isAvailability());
+            productDTO.setPrice(product.getPrice());
+            productDTO.setCategory(product.getCategory());
+            productDTO.setImageLink(product.getImageLink());
+
+            productDTO.setIngredients(product.getIngredients().stream()
+                    .map(ingredient -> new ProductDTO.IngredientDTO(ingredient.getId(), ingredient.getName()))
+                    .collect(Collectors.toSet()));
+            return productDTO;
+        }).collect(Collectors.toList());
+    }
 }
 
 
