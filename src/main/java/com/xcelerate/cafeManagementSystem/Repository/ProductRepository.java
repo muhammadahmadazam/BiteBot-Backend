@@ -9,12 +9,10 @@ import java.util.Optional;
 import java.util.List;
 
 public interface ProductRepository extends JpaRepository<Product, Long> {
-<<<<<<< HEAD
     List<Product> getAllByEmotion(String emotion);
-=======
 
     @Query("SELECT p FROM Product p JOIN FETCH p.ingredients WHERE p.id = :id")
     Optional<Product> findByIdWithIngredients(@Param("id") int id);
 
->>>>>>> d015753 (merged)
+
 }

@@ -107,7 +107,7 @@ public class ProductService {
     }
 
     public ProductDTO getByProductById(long id) {
-        Optional<Product> product = productRepository.findByIdWithIngredients(id);
+        Optional<Product> product = productRepository.findByIdWithIngredients((int)id);
 
         if (product.isPresent()) {
             ProductDTO productDTO = new ProductDTO();

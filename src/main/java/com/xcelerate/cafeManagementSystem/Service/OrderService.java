@@ -44,11 +44,4 @@ public class OrderService {
     }
 
 
-    public boolean isOrderConfirmed() {
-        Order  = orderRepository.findByEmail(email);
-        if(customer == null) {
-            return 0;
-        }
-        return customer.getVerified() ? 2 : 1;
-    }
 }

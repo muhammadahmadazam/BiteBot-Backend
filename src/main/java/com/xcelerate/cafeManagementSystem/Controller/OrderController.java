@@ -2,6 +2,7 @@ package com.xcelerate.cafeManagementSystem.Controller;
 
 import com.xcelerate.cafeManagementSystem.DTOs.ApiResponseDTO;
 import com.xcelerate.cafeManagementSystem.DTOs.OrderRequest;
+import com.xcelerate.cafeManagementSystem.DTOs.otpDTO;
 import com.xcelerate.cafeManagementSystem.Model.Customer;
 import com.xcelerate.cafeManagementSystem.Model.Order;
 import com.xcelerate.cafeManagementSystem.Model.Product;
@@ -97,7 +98,7 @@ public class OrderController {
 
 
     @PostMapping("/order/confirm")
-    public ResponseEntity<ApiResponseDTO<String>> placeOrder(@RequestBody String otp) {
+    public ResponseEntity<ApiResponseDTO<String>> placeOrder(@RequestBody otpDTO otp) {
         Authentication auth =  SecurityContextHolder.getContext().getAuthentication();
         String email = auth.getName();
 
@@ -108,9 +109,8 @@ public class OrderController {
             return new ResponseEntity<ApiResponseDTO<String>>(apiResponseDTO, HttpStatus.BAD_REQUEST);
         }
 
-        if (otpService.validateOtp(email, otp)) {
-            customerService.verifyUser(email);
-            ApiResponseDTO<String> response = new ApiResponseDTO<>("Email verified successfully", email);
+        if (otpService.validateOtp(email, otp.otp)) {
+            ApiResponseDTO<String> response = new ApiResponseDTO<>("Order confirmed successfully", email);
             return new ResponseEntity<>(response, HttpStatus.OK);
         }else{
             ApiResponseDTO<String> responseDTO = new ApiResponseDTO<>();
@@ -121,7 +121,7 @@ public class OrderController {
 
 
     @PostMapping("/order/resendOTP")
-    public ResponseEntity<ApiResponseDTO<String>>  resendOTP(@RequestBody String otp) {
+    public ResponseEntity<ApiResponseDTO<String>>  resendOTP() {
         Authentication auth =  SecurityContextHolder.getContext().getAuthentication();
         String email = auth.getName();
 
