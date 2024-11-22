@@ -9,6 +9,7 @@ import com.xcelerate.cafeManagementSystem.Service.CustomerService;
 import com.xcelerate.cafeManagementSystem.Service.OtpService;
 import com.xcelerate.cafeManagementSystem.Utils.EmailUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
@@ -17,8 +18,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.concurrent.CompletableFuture;
 
 @RestController
+@CrossOrigin(origins = "${frontendURL}")
 @RequestMapping("/api/register")
-//@CrossOrigin("http://localhost:3000")
 public class RegistrationController {
 
     @Autowired
@@ -49,7 +50,7 @@ public class RegistrationController {
             return new ResponseEntity<>(response, HttpStatus.OK);
         }
         ApiResponseDTO<String> response = new ApiResponseDTO<>("Error in sending OTP", email);
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @PostMapping("/verify-otp")
