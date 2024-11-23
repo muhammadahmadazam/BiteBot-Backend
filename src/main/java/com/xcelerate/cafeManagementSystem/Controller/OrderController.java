@@ -1,8 +1,6 @@
 package com.xcelerate.cafeManagementSystem.Controller;
 
-import com.xcelerate.cafeManagementSystem.DTOs.ApiResponseDTO;
-import com.xcelerate.cafeManagementSystem.DTOs.OrderRequest;
-import com.xcelerate.cafeManagementSystem.DTOs.otpDTO;
+import com.xcelerate.cafeManagementSystem.DTOs.*;
 import com.xcelerate.cafeManagementSystem.Model.Customer;
 import com.xcelerate.cafeManagementSystem.Model.Order;
 import com.xcelerate.cafeManagementSystem.Model.Product;
@@ -13,6 +11,7 @@ import com.xcelerate.cafeManagementSystem.Service.OtpService;
 import com.xcelerate.cafeManagementSystem.Service.ProductService;
 import com.xcelerate.cafeManagementSystem.Utils.JwtUtil;
 import org.apache.hc.client5.http.auth.BearerToken;
+import org.aspectj.weaver.ast.Or;
 import org.springframework.boot.autoconfigure.security.oauth2.resource.OAuth2ResourceServerProperties;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -135,6 +134,39 @@ public class OrderController {
             responseDTO.message = "Failed to resend OTP";
             return new ResponseEntity<>( responseDTO, HttpStatus.BAD_REQUEST);
         }
+    }
+
+    @GetMapping("/orders/track")
+    public ResponseEntity<ApiResponseDTO<List<OrderDTO>>> trackOrder(){
+        Authentication auth =  SecurityContextHolder.getContext().getAuthentication();
+        String email = auth.getName();
+        System.out.println("Email: ");
+        System.out.println("Email: " + email);
+        Customer c = customerService.getCustomerByEmail(email);
+        if (c == null) {
+            ApiResponseDTO<List<OrderDTO>> apiResponseDTO = new ApiResponseDTO<>();
+            apiResponseDTO.message = "User not found, cannot place order";
+            return new ResponseEntity<>(apiResponseDTO, HttpStatus.BAD_REQUEST);
+        }
+
+        List<Order> orders = orderService.getOrdersByCustomerId(c.getId());
+
+        List<OrderDTO> orders_details = new ArrayList<>();
+
+        for (Order order : orders) {
+            List<SalesLineItemDTO> salesLineItems = new ArrayList<>();
+            for (SalesLineItem salesLineItem : order.getOrderItems()) {
+
+                SalesLineItemDTO salesLineItemDTO = new SalesLineItemDTO(salesLineItem.getQuantity(), salesLineItem.getProduct().getName(), salesLineItem.getProduct().getImageLink(), salesLineItem.getUnitPrice());
+                salesLineItems.add(salesLineItemDTO);
+            }
+            String estimated_time = orderService.getEstimatedTime(order.getLatitude(), order.getLongitude());
+            OrderDTO orderDTO = new OrderDTO(order.getOrderId(), order.getTotalPrice(), order.getCustomer().getId(), order.getStatus(), order.getOrderDate(),estimated_time, order.getPaymentMethod(), order.getAddress(), salesLineItems);
+            orders_details.add(orderDTO);
+        }
+
+        ApiResponseDTO<List<OrderDTO>> response = new ApiResponseDTO<>("orders fetched successfully",orders_details);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
 }

@@ -1,10 +1,12 @@
 package com.xcelerate.cafeManagementSystem.Service;
 
+import com.google.gson.Gson;
 import com.xcelerate.cafeManagementSystem.Model.Customer;
 import com.xcelerate.cafeManagementSystem.Model.Order;
 import com.xcelerate.cafeManagementSystem.Model.SalesLineItem;
 import com.xcelerate.cafeManagementSystem.Repository.OrderRepository;
 import com.xcelerate.cafeManagementSystem.Repository.SalesLineItemRepository;
+import okhttp3.OkHttpClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +19,9 @@ import java.util.Optional;
 public class OrderService {
     private final OrderRepository orderRepository;
     private final SalesLineItemRepository salesLineItemRepository;
+
+    @Autowired
+    private OpenRouteService openRouteService;
 
     @Autowired
     OrderService(OrderRepository orderRepository,SalesLineItemRepository salesLineItemRepository) {
@@ -42,6 +47,15 @@ public class OrderService {
 //        saleLineItems.forEach(lineItem -> {lineItem.setOrder(o);System.out.println("ProductID: " + lineItem.getProduct().getId() + "Quantity: " + lineItem.getQuantity() + "OrderID: " + lineItem.getOrder().getOrderId()); salesLineItemRepository.save(lineItem);});
         return true;
     }
+
+    public List<Order> getOrdersByCustomerId(long customerId) {
+        return orderRepository.findAllByCustomerId(customerId);
+    }
+
+    public String getEstimatedTime(String dest_lat, String dest_lon) {
+        return openRouteService.getEstimatedTime(dest_lat, dest_lon);
+    }
+
 
 
 }

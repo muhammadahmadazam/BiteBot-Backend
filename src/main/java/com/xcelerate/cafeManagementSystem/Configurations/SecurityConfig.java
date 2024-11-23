@@ -39,7 +39,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests()
                 .requestMatchers("/api/auth/**","/api/register/**", "/api/products/get/**")
                 .permitAll()
-                .requestMatchers("/api/recommendation/**")
+                .requestMatchers("/api/recommendation/**", "/api/order/**", "/api/orders/**")
                 .hasRole("CUSTOMER")
                 .anyRequest()
                 .authenticated()

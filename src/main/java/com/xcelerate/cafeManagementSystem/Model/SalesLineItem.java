@@ -11,7 +11,7 @@ public class SalesLineItem {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private Long quantity;
-    private Long unitPrice;
+    private float unitPrice;
 
 
     @ManyToOne
@@ -40,11 +40,11 @@ public class SalesLineItem {
         this.quantity = quantity;
     }
 
-    public Long getUnitPrice() {
+    public float getUnitPrice() {
         return unitPrice;
     }
 
-    public void setUnitPrice(Long unitPrice) {
+    public void setUnitPrice(float unitPrice) {
         this.unitPrice = unitPrice;
     }
 
