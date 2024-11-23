@@ -48,8 +48,8 @@ public class OrderService {
         return true;
     }
 
-    public List<Order> getOrdersByCustomerId(long customerId) {
-        return orderRepository.findAllByCustomerId(customerId);
+    public List<Order> getConfirmedOrdersByCustomerId(long customerId) {
+        return orderRepository.findAllByCustomerIdOrStatusNot(customerId, "UNCONFIRMED");
     }
 
     public String getEstimatedTime(String dest_lat, String dest_lon) {

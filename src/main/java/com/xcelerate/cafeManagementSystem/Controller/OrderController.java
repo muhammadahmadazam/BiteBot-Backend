@@ -1,5 +1,6 @@
 package com.xcelerate.cafeManagementSystem.Controller;
 
+import com.cloudinary.Api;
 import com.xcelerate.cafeManagementSystem.DTOs.*;
 import com.xcelerate.cafeManagementSystem.Model.Customer;
 import com.xcelerate.cafeManagementSystem.Model.Order;
@@ -10,6 +11,7 @@ import com.xcelerate.cafeManagementSystem.Service.OrderService;
 import com.xcelerate.cafeManagementSystem.Service.OtpService;
 import com.xcelerate.cafeManagementSystem.Service.ProductService;
 import com.xcelerate.cafeManagementSystem.Utils.JwtUtil;
+import jakarta.validation.constraints.Past;
 import org.apache.hc.client5.http.auth.BearerToken;
 import org.aspectj.weaver.ast.Or;
 import org.springframework.boot.autoconfigure.security.oauth2.resource.OAuth2ResourceServerProperties;
@@ -149,7 +151,7 @@ public class OrderController {
             return new ResponseEntity<>(apiResponseDTO, HttpStatus.BAD_REQUEST);
         }
 
-        List<Order> orders = orderService.getOrdersByCustomerId(c.getId());
+        List<Order> orders = orderService.getConfirmedOrdersByCustomerId(c.getId());
 
         List<OrderDTO> orders_details = new ArrayList<>();
 
@@ -166,6 +168,37 @@ public class OrderController {
         }
 
         ApiResponseDTO<List<OrderDTO>> response = new ApiResponseDTO<>("orders fetched successfully",orders_details);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+
+    @GetMapping("/orders/get-by-customer")
+    public ResponseEntity<ApiResponseDTO<List<PastOrderDTO>>> getPastOrders(){
+        Authentication auth =  SecurityContextHolder.getContext().getAuthentication();
+        String email = auth.getName();
+        Customer c = customerService.getCustomerByEmail(email);
+        if (c == null) {
+            ApiResponseDTO<List<PastOrderDTO>> apiResponseDTO = new ApiResponseDTO<>();
+            apiResponseDTO.message = "User not found, cannot place order";
+
+            return new ResponseEntity<>(apiResponseDTO, HttpStatus.BAD_REQUEST);
+        }
+
+        List<Order> orders = orderService.getConfirmedOrdersByCustomerId(c.getId());
+
+        List<PastOrderDTO> orders_details = new ArrayList<>();
+
+        for (Order order : orders) {
+            List<SalesLineItemDTO> salesLineItems = new ArrayList<>();
+            for(SalesLineItem salesLineItem : order.getOrderItems()) {
+                SalesLineItemDTO salesLineItemDTO = new SalesLineItemDTO(salesLineItem.getQuantity(), salesLineItem.getProduct().getName(), salesLineItem.getProduct().getImageLink(), salesLineItem.getUnitPrice());
+                salesLineItems.add(salesLineItemDTO);
+            }
+            PastOrderDTO pastOrderDTO = new PastOrderDTO(order.getOrderId(), order.getTotalPrice(), order.getStatus(), order.getOrderDate(), order.getPaymentMethod(), order.getAddress(), salesLineItems);
+            orders_details.add(pastOrderDTO);
+        }
+
+        ApiResponseDTO<List<PastOrderDTO>> response = new ApiResponseDTO<>("orders fetched successfully",orders_details);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
