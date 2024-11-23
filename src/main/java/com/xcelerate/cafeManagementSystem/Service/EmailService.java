@@ -34,6 +34,7 @@ public class EmailService {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
     }
 
     private MimeMessage createEmail(String to, String from, String subject, String body) throws Exception {

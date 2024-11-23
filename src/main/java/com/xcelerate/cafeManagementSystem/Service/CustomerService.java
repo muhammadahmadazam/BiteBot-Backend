@@ -70,6 +70,11 @@ public class CustomerService {
         Optional<Customer> customer = customerRepository.findByEmailIgnoreCase(email);
         return customer.orElse(null);
     }
+
+    public Customer getCustomerById(long id) {
+        Optional<Customer> customer = customerRepository.findById(id);
+        return customer.orElse(null);
+    }
 }
 
 

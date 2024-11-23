@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 public class FeedbackService {
 
@@ -31,6 +33,10 @@ public class FeedbackService {
         feedback.order = order;
         feedback.emotion = emotionAnalysisService.getEmotion(content);
         return feedbackRepository.save(feedback);
+    }
+
+    public List<Feedback> getFeedbacks() {
+        return feedbackRepository.findAll();
     }
 
 }
