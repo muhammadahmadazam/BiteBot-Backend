@@ -41,6 +41,8 @@ public class SecurityConfig {
                 .permitAll()
                 .requestMatchers("/api/recommendation/**", "/api/order/**", "/api/orders/**", "/api/insights/**")
                 .hasRole("CUSTOMER")
+                .requestMatchers("/api/order/create", "/api/order/**", "/api/orders/**")
+                .hasRole("WORKER")
                 .anyRequest()
                 .authenticated()
                 .and()

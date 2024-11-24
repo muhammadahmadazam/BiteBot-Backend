@@ -1,6 +1,5 @@
 package com.xcelerate.cafeManagementSystem.Controller;
 
-import com.cloudinary.Api;
 import com.xcelerate.cafeManagementSystem.DTOs.*;
 import com.xcelerate.cafeManagementSystem.Model.Customer;
 import com.xcelerate.cafeManagementSystem.Model.Order;
@@ -11,7 +10,6 @@ import com.xcelerate.cafeManagementSystem.Service.OrderService;
 import com.xcelerate.cafeManagementSystem.Service.OtpService;
 import com.xcelerate.cafeManagementSystem.Service.ProductService;
 import com.xcelerate.cafeManagementSystem.Utils.JwtUtil;
-import jakarta.validation.constraints.Past;
 import org.apache.hc.client5.http.auth.BearerToken;
 import org.aspectj.weaver.ast.Or;
 import org.springframework.boot.autoconfigure.security.oauth2.resource.OAuth2ResourceServerProperties;
@@ -117,7 +115,7 @@ public class OrderController {
         }else{
             ApiResponseDTO<String> responseDTO = new ApiResponseDTO<>();
             responseDTO.message = "OTP verification failed";
-            return new ResponseEntity<>(responseDTO, HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(responseDTO, HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -202,6 +200,13 @@ public class OrderController {
         ApiResponseDTO<List<PastOrderDTO>> response = new ApiResponseDTO<>("orders fetched successfully",orders_details);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+
+    @PostMapping("/order/prepare")
+    public ResponseEntity<Worker_Response_DTO> prepareOrder(@RequestBody String orderId) {
+
+    }
+
 
 }
 
