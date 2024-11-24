@@ -20,6 +20,7 @@ public class Order {
     public String status;
     public float totalPrice;
     public Date orderDate;
+    public String Sector;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<SalesLineItem> orderItems;
@@ -106,5 +107,13 @@ public class Order {
 
     public void setCustomer(Customer customer) {
         this.customer = customer;
+    }
+
+    public String getSector() {
+        return Sector;
+    }
+
+    public void setSector(String sector) {
+        Sector = sector;
     }
 }

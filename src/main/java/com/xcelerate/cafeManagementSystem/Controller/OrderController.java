@@ -32,14 +32,14 @@ import java.util.List;
 public class OrderController {
 
 
-    private final JwtUtil jwtUtil;
+
     private final OrderService orderService;
     private final ProductService productService;
     private final CustomerService customerService;
     private final OtpService otpService;
 
-    public OrderController(JwtUtil jwtUtil, OrderService orderService, ProductService productService, CustomerService customerService, OtpService otpService) {
-        this.jwtUtil = jwtUtil;
+    public OrderController(OrderService orderService, ProductService productService, CustomerService customerService, OtpService otpService) {
+
         this.orderService = orderService;
         this.productService = productService;
         this.customerService = customerService;
@@ -65,6 +65,7 @@ public class OrderController {
         order.setAddress(orderRequest.getAddress());
         order.setLatitude(orderRequest.getLatitude());
         order.setLongitude(orderRequest.getLongitude());
+        order.setSector(orderRequest.getSector());
         List<SalesLineItem> saleLineItems = new ArrayList<>();
 
         for (OrderRequest.LineItemRequest lineItem : orderRequest.getLineItems()) {

@@ -6,6 +6,7 @@ public class OrderRequest {
     private String  address;
     private String latitude;
     private String longitude;
+    private String sector;
     private List<LineItemRequest> lineItems;
 
 
@@ -29,6 +30,14 @@ public class OrderRequest {
         public void setQuantity(int quantity) {
             this.quantity = quantity;
         }
+    }
+
+    public String getSector() {
+        return sector;
+    }
+
+    public void setSector(String sector) {
+        this.sector = sector;
     }
 
     public String getPaymentMethod() {
