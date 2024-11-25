@@ -20,7 +20,7 @@ public class Order {
     public String status;
     public float totalPrice;
     public Date orderDate;
-    public String Sector;
+    public String sector;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<SalesLineItem> orderItems;
@@ -110,10 +110,10 @@ public class Order {
     }
 
     public String getSector() {
-        return Sector;
+        return sector;
     }
 
     public void setSector(String sector) {
-        Sector = sector;
+        this.sector = sector;
     }
 }
