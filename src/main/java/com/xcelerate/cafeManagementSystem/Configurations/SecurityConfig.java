@@ -40,7 +40,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/auth/**","/api/register/**", "/api/products/get/**", "/api/recommendation/**" )
                 .permitAll()
                 .requestMatchers( "/api/order/**", "/api/orders/**")
-                .hasAnyRole("CUSTOMER", "WORKER")
+                .hasAnyRole("CUSTOMER", "WORKER", "DELIVERY_MAN")
                 .requestMatchers("/api/recommendation/**")
                 .hasRole("CUSTOMER")
                 .requestMatchers("/api/worker/**","/api/workers/**", "/api/product/create", "/api/product/delete", "/api/product/update,/api/insights/**")

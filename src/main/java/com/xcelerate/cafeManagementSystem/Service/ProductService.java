@@ -8,6 +8,9 @@ import com.xcelerate.cafeManagementSystem.Repository.IngredientRepository;
 import com.xcelerate.cafeManagementSystem.Repository.ProductRepository;
 import org.springframework.transaction.annotation.Transactional;import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -25,7 +28,7 @@ public class ProductService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public boolean createProduct(Product p) {
+    public Product createProduct(Product p) {
         try {
 //            //  CHECK IF ALL INGREDIENTS ARE THERE IN THE TABLE IF NOT INSERT THEM FIRST
             List<Ingredient> newIngredients = new ArrayList<>();
@@ -52,10 +55,10 @@ public class ProductService {
             p.setIngredients(new HashSet<>(Arrays.asList(newIngredients.toArray(new Ingredient[0]))));
 //            System.out.println("Ingredients are okay..");
             productRepository.save(p);
-            return true;
+            return p;
         }catch (Exception e) {
             System.out.println(e.getMessage());
-            return false;
+            return null;
         }
     }
 

@@ -1,7 +1,9 @@
 package com.xcelerate.cafeManagementSystem.DTOs;
+import com.xcelerate.cafeManagementSystem.Model.Product;
 import jakarta.persistence.Column;
 
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class ProductDTO {
     private long id;
@@ -15,6 +17,19 @@ public class ProductDTO {
     private String emotion;
     // Getters and setters
 
+    public  ProductDTO() {}
+    public ProductDTO(Product product) {
+        this.setId(product.getId());
+        this.setName(product.getName());
+        this.setDescription(product.getDescription());
+        this.setAvailability(product.isAvailability());
+        this.setPrice(product.getPrice());
+        this.setCategory(product.getCategory());
+        this.setImageLink(product.getImageLink());
+        this.setIngredients(product.getIngredients().stream()
+                .map(ingredient -> new ProductDTO.IngredientDTO(ingredient.getId(), ingredient.getName()))
+                .collect(Collectors.toSet()));
+    }
     public long getId() {
         return id;
     }

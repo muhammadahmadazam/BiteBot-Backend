@@ -120,6 +120,32 @@ public class OrderService {
     }
 
     @Transactional
+    public boolean deliverOrder(String orderId) {
+        Optional<Order> o = orderRepository.findById(orderId);
+        if (o.isPresent()) {
+            Order order = o.get();
+            order.setStatus("DELIVERED");
+            orderRepository.save(order);
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    @Transactional
+    public boolean deliverFailed(String orderId) {
+        Optional<Order> o = orderRepository.findById(orderId);
+        if (o.isPresent()) {
+            Order order = o.get();
+            order.setStatus("PREPARING");
+            orderRepository.save(order);
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    @Transactional
     public List<Order> getCompleteOrders() {
         return orderRepository.findByStatusWithSaleLineItems("COMPLETED");
     }

@@ -281,6 +281,59 @@ public class OrderController {
 
     }
 
+
+    @PostMapping("/order/delivered")
+    public ResponseEntity<ApiResponseDTO<String>> deliverOrder(@RequestBody Order_Update_DTO orderUpdateDto) {
+        Authentication auth =  SecurityContextHolder.getContext().getAuthentication();
+        String email = auth.getName();
+        Worker w = workerService.findByEmail(email);
+        if (w == null) {
+            ApiResponseDTO<String> apiResponse = new ApiResponseDTO<String>();
+            apiResponse.message = "You are not authorized to change order status.";
+            return new ResponseEntity<>(apiResponse, HttpStatus.UNAUTHORIZED);
+        }else{
+            boolean orderStatusUpdated =  orderService.deliverOrder(orderUpdateDto.getOrderId());
+            if (orderStatusUpdated) {
+                ApiResponseDTO<String> apiResponse = new ApiResponseDTO<String>();
+                apiResponse.message = "Order Status updated successfully.";
+                apiResponse.data = "ORDER_DELIVERED";
+                return new ResponseEntity<>(apiResponse, HttpStatus.OK);
+            }else{
+                ApiResponseDTO<String> apiResponse = new ApiResponseDTO<String>();
+                apiResponse.message = "Order Status not updated successfully.";
+                return new ResponseEntity<>(apiResponse, HttpStatus.BAD_REQUEST);
+            }
+        }
+
+    }
+
+
+    @PostMapping("/order/deliver-failed")
+    public ResponseEntity<ApiResponseDTO<String>> deliverOrderFailed(@RequestBody Order_Failed_DTO orderUpdateDto) {
+        Authentication auth =  SecurityContextHolder.getContext().getAuthentication();
+        String email = auth.getName();
+        Worker w = workerService.findByEmail(email);
+        if (w == null) {
+            ApiResponseDTO<String> apiResponse = new ApiResponseDTO<String>();
+            apiResponse.message = "You are not authorized to change order status.";
+            return new ResponseEntity<>(apiResponse, HttpStatus.UNAUTHORIZED);
+        }else{
+            boolean orderStatusUpdated =  orderService.deliverFailed(orderUpdateDto.getOrderId());
+            if (orderStatusUpdated) {
+                ApiResponseDTO<String> apiResponse = new ApiResponseDTO<String>();
+                apiResponse.message = "Order Status updated successfully.";
+                apiResponse.data = "ORDER_UPDATED";
+                return new ResponseEntity<>(apiResponse, HttpStatus.OK);
+            }else{
+                ApiResponseDTO<String> apiResponse = new ApiResponseDTO<String>();
+                apiResponse.message = "Order Status not updated successfully.";
+                return new ResponseEntity<>(apiResponse, HttpStatus.BAD_REQUEST);
+            }
+        }
+
+    }
+
+
     @PostMapping("/orders/get-prepared-orders")
     public ResponseEntity<ApiResponseDTO<List<Order_DeliveryDTO>>> getUndeliveredOrders() {
         Authentication auth =  SecurityContextHolder.getContext().getAuthentication();

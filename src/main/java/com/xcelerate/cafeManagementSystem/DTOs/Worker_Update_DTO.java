@@ -15,6 +15,16 @@ public class Worker_Update_DTO {
     @NotNull
     public String position;
 
+    public String vehicle;
+
+    public String getVehicle() {
+        return vehicle;
+    }
+
+    public void setVehicle(String vehicle) {
+        this.vehicle = vehicle;
+    }
+
     @NotNull
     public long getWorkerId() {
         return workerId;

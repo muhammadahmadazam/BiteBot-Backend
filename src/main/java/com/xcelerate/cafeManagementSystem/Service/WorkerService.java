@@ -2,6 +2,7 @@ package com.xcelerate.cafeManagementSystem.Service;
 
 import com.xcelerate.cafeManagementSystem.DTOs.Worker_Create_DTO;
 import com.xcelerate.cafeManagementSystem.DTOs.Worker_Update_DTO;
+import com.xcelerate.cafeManagementSystem.Model.DeliveryMan;
 import com.xcelerate.cafeManagementSystem.Model.Worker;
 import com.xcelerate.cafeManagementSystem.Repository.WorkerRespository;
 import com.xcelerate.cafeManagementSystem.Utils.PasswordUtil;
@@ -25,13 +26,21 @@ public class WorkerService {
     }
 
     public Worker createWorker(Worker_Create_DTO workerDTO) {
-        Worker worker = new Worker();
+        Worker worker = null;
+        if (workerDTO.type.equals("DELIVERY_MAN")) {
+            DeliveryMan deliveryMan = new DeliveryMan();
+            deliveryMan.setVehicle(workerDTO.vehicle);
+            worker =deliveryMan;
+            worker.setRole("DELIVERY_MAN");
+        }else{
+            worker = new Worker();
+            worker.setRole("WORKER");
+        }
         worker.setPosition(workerDTO.getPosition());
         worker.setEmail(workerDTO.getEmail());
         worker.setPassword(PasswordUtil.hashPassword(workerDTO.getPassword()));
         worker.setSalary(workerDTO.getSalary());
         worker.setJoinDate(new Date());
-        worker.setRole("WORKER");
         return workerRepository.save(worker);
     }
 
@@ -69,6 +78,9 @@ public class WorkerService {
     public boolean updateWorker(Worker_Update_DTO workerDTO) {
         Worker w = workerRepository.findById(workerDTO.getWorkerId()).orElse(null);
         if (w != null) {
+            if (w instanceof DeliveryMan) {
+             ((DeliveryMan) w).setVehicle(workerDTO.getVehicle());
+            }
             w.setEmail(workerDTO.getEmail());
             w.setPassword(PasswordUtil.hashPassword(workerDTO.getPassword()));
             w.setSalary(workerDTO.getSalary());
@@ -79,4 +91,6 @@ public class WorkerService {
             return false;
         }
     }
+
+
 }

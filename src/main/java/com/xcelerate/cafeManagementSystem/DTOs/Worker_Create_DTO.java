@@ -11,7 +11,10 @@ public class Worker_Create_DTO {
     public Long salary;
     @NotNull
     public String position;
-
+    @NotNull
+    public String type;
+    @NotNull
+    public String vehicle;
 
     public @NotNull String getEmail() {
         return email;

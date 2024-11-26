@@ -2,37 +2,22 @@ package com.xcelerate.cafeManagementSystem.Model;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.util.Date;
 
 @Entity
 @Table(name = "deliveryMen")
-public class DeliveryMan extends User {
-    private Long salary;
-    private String position;
-    private Date joinDate;
+@OnDelete(action = OnDeleteAction.CASCADE)
+public class DeliveryMan extends Worker {
+    private String vehicle;
 
-    public Long getSalary() {
-        return salary;
+    public String getVehicle() {
+        return vehicle;
     }
 
-    public void setSalary(Long salary) {
-        this.salary = salary;
-    }
-
-    public String getPosition() {
-        return position;
-    }
-
-    public void setPosition(String position) {
-        this.position = position;
-    }
-
-    public Date getJoinDate() {
-        return joinDate;
-    }
-
-    public void setJoinDate(Date joinDate) {
-        this.joinDate = joinDate;
+    public void setVehicle(String vehicle) {
+        this.vehicle = vehicle;
     }
 }

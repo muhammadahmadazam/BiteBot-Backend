@@ -1,12 +1,15 @@
 package com.xcelerate.cafeManagementSystem.Model;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.Inheritance;
+import jakarta.persistence.InheritanceType;
 import jakarta.persistence.Table;
 
 import java.util.Date;
 
 @Entity
 @Table(name = "workers")
+@Inheritance(strategy = InheritanceType.JOINED)
 public class Worker extends User {
     private Long salary;
     private String position;
