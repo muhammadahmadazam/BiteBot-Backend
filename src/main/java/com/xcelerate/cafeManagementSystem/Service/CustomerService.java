@@ -5,6 +5,7 @@ import com.xcelerate.cafeManagementSystem.Model.Customer;
 import com.xcelerate.cafeManagementSystem.Model.User;
 import com.xcelerate.cafeManagementSystem.Repository.CustomerRepository;
 import com.xcelerate.cafeManagementSystem.Repository.OrderRepository;
+import com.xcelerate.cafeManagementSystem.Utils.EmailUtil;
 import com.xcelerate.cafeManagementSystem.Utils.PasswordUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -33,7 +34,21 @@ public class CustomerService {
     * @return the customer object
      */
     public Customer createUser(String email, String password, String name, String phone) {
+
+        if(email.isEmpty() || password.isEmpty() || name.isEmpty()  || phone.isEmpty()) {
+            return null;
+        }
+
+        if(EmailUtil.verifyEmailFormat(email) == false) {
+            return null;
+        }
+
+        if(customerRepository.findByEmail(email) != null) {
+            return null;
+        }
+
         String hashPassword = PasswordUtil.hashPassword(password);
+
 
         Customer customer = new Customer(name, phone, email, hashPassword, UserRoles.CUSTOMER);
 

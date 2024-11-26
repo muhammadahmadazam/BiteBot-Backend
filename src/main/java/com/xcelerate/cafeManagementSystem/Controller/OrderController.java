@@ -53,6 +53,7 @@ public class OrderController {
         order.setLatitude(orderRequest.getLatitude());
         order.setLongitude(orderRequest.getLongitude());
         order.setSector(orderRequest.getSector());
+
         List<SalesLineItem> saleLineItems = new ArrayList<>();
 
         for (OrderRequest.LineItemRequest lineItem : orderRequest.getLineItems()) {
@@ -121,6 +122,12 @@ public class OrderController {
     public ResponseEntity<ApiResponseDTO<String>>  resendOTP() {
         Authentication auth =  SecurityContextHolder.getContext().getAuthentication();
         String email = auth.getName();
+        Customer c = customerService.getCustomerByEmail(email);
+        if (c == null) {
+            ApiResponseDTO<String> apiResponseDTO = new ApiResponseDTO<String>();
+            apiResponseDTO.message = "User not found, cannot place order";
+            return new ResponseEntity<ApiResponseDTO<String>>(apiResponseDTO, HttpStatus.BAD_REQUEST);
+        }
 
         boolean isOtpSent = otpService.generateAndSendOtp(email);
         if (isOtpSent) {
