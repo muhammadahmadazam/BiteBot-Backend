@@ -56,7 +56,11 @@ public class OrderService {
     }
 
     public List<Order> getConfirmedOrdersByCustomerId(long customerId) {
-        return orderRepository.findAllByCustomerIdOrStatusNot(customerId, "UNCONFIRMED");
+        return orderRepository.findAllByCustomerIdAndStatusNotIn(customerId, Arrays.asList("UNCONFIRMED", "DELIVERED", "CANCELLED"));
+    }
+
+    public List<Order> getDeliveredOrdersByCustomerId(long customerId) {
+        return orderRepository.findAllByCustomerIdAndStatus(customerId, "DELIVERED");
     }
 
     public String getEstimatedTime(String dest_lat, String dest_lon) {

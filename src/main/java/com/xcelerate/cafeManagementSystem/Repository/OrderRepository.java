@@ -11,7 +11,7 @@ import java.util.Date;
 import java.util.Optional;
 
 public interface OrderRepository extends JpaRepository<Order, String> {
-    List<Order> findAllByCustomerIdOrStatusNot(long customer, String status);
+    List<Order> findAllByCustomerIdAndStatusNotIn(long customerId, List<String> statuses);
     List<Order> findAllByCustomerId(long customer);
     Order findByOrderId(String orderId);
     @Query("SELECT o FROM Order o " +
@@ -27,6 +27,7 @@ public interface OrderRepository extends JpaRepository<Order, String> {
             "WHERE o.status = :status")
     List<Order> findByStatusWithSaleLineItems(@Param("status") String status);
 
+    List<Order> findAllByCustomerIdAndStatus(long customerId, String status);
 
     Optional<Order> findFirstByCustomerIdAndStatusOrderByOrderDateDesc(long customerId, String status);
 

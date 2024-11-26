@@ -179,7 +179,7 @@ public class OrderController {
             return new ResponseEntity<>(apiResponseDTO, HttpStatus.BAD_REQUEST);
         }
 
-        List<Order> orders = orderService.getConfirmedOrdersByCustomerId(c.getId());
+        List<Order> orders = orderService.getDeliveredOrdersByCustomerId(c.getId());
 
         List<PastOrderDTO> orders_details = new ArrayList<>();
 
