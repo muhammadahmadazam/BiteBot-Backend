@@ -23,17 +23,21 @@ import java.util.logging.Logger;
 public class OrderService {
     private final OrderRepository orderRepository;
     private final SalesLineItemRepository salesLineItemRepository;
+    private final EmailService emailService;
 
     @Autowired
     private OpenRouteService openRouteService;
 
 
+
+
     private static final Logger logger = Logger.getLogger(OrderService.class.getName());
 
     @Autowired
-    OrderService(OrderRepository orderRepository,SalesLineItemRepository salesLineItemRepository) {
+    OrderService(OrderRepository orderRepository,SalesLineItemRepository salesLineItemRepository, EmailService emailService) {
         this.orderRepository = orderRepository;
         this.salesLineItemRepository = salesLineItemRepository;
+        this.emailService = emailService;
     }
 
     @Transactional
@@ -88,6 +92,10 @@ public class OrderService {
             Order order = o.get();
             order.setStatus("PREPARING");
             orderRepository.save(order);
+            String email = order.getCustomer().getEmail();
+            String Subject = "Order No " + order.getOrderId() + " is being prepared";
+            String Body = "Dear Customer.\nYour order is being prepared. It will be out for delivery shortly.";
+            emailService.sendEmail(email, Subject, Body);
             return true;
         }else{
             return false;
@@ -101,6 +109,10 @@ public class OrderService {
             Order order = o.get();
             order.setStatus("COMPLETED");
             orderRepository.save(order);
+            String email = order.getCustomer().getEmail();
+            String Subject = "Order No " + order.getOrderId() + " is ready for delivery";
+            String Body = "Dear Customer.\nYour order is being prepared. It will at your door step shortly.";
+            emailService.sendEmail(email, Subject, Body);
             return true;
         }else{
             return false;
