@@ -8,6 +8,7 @@ import com.xcelerate.cafeManagementSystem.Repository.OrderRepository;
 import com.xcelerate.cafeManagementSystem.Repository.SalesLineItemRepository;
 import okhttp3.OkHttpClient;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +25,7 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final SalesLineItemRepository salesLineItemRepository;
     private final EmailService emailService;
+
 
     @Autowired
     private OpenRouteService openRouteService;
@@ -133,12 +135,21 @@ public class OrderService {
     }
 
     @Transactional
-    public boolean deliverFailed(String orderId) {
+    public boolean deliverFailed(String orderId, String reason, long workerId) {
         Optional<Order> o = orderRepository.findById(orderId);
         if (o.isPresent()) {
             Order order = o.get();
             order.setStatus("PREPARING");
             orderRepository.save(order);
+            String email = order.getCustomer().getEmail();
+            String Subject = "Order No " + order.getOrderId() + " is delayed for delivery";
+            String Body = "Dear Customer.\nyour order became a victim to unfortunate circumstances.\nDon't worry it is set to prepare again and will be at your doorstep shortly. \nRegards,\nOrder Management Staff @ Bitebot";
+            emailService.sendEmail(email, Subject, Body);
+
+            String email2 = "thirstycheems@gmail.com";
+            String Subject2 = "Failed order by Worker: " + workerId;
+            String Body2 = reason;
+            emailService.sendEmail(email2, Subject2, Body2);
             return true;
         }else{
             return false;
@@ -149,6 +160,7 @@ public class OrderService {
     public List<Order> getCompleteOrders() {
         return orderRepository.findByStatusWithSaleLineItems("COMPLETED");
     }
+
     @Transactional
     public List<Order> getQueuedOrders() {
         return orderRepository.findByStatusWithSaleLineItems("PROCESSING");
@@ -158,6 +170,7 @@ public class OrderService {
     public List<Order> getPreparingOrders() {
         return orderRepository.findByStatusWithSaleLineItems("PREPARING");
     }
+
     public Map<String, Long> getOrderCountBySector(){
         List<Object[]> sectorCount = orderRepository.countOrdersBySector();
         Map<String, Long> sectorCountMap = new HashMap<>();
