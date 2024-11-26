@@ -1,45 +1,41 @@
 package com.xcelerate.cafeManagementSystem.Controller;
 
-
 import com.xcelerate.cafeManagementSystem.DTOs.ApiResponseDTO;
 import com.xcelerate.cafeManagementSystem.DTOs.ProductDTO;
 import com.xcelerate.cafeManagementSystem.DTOs.PromptDTO;
-import com.xcelerate.cafeManagementSystem.Model.Product;
-import com.xcelerate.cafeManagementSystem.Service.EmotionAnalysisService;
-import com.xcelerate.cafeManagementSystem.Service.ProductService;
+import com.xcelerate.cafeManagementSystem.Service.RecommendationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.logging.Logger;
 
 @RestController
 @RequestMapping("/api/recommendation/")
 @CrossOrigin(origins = "${frontendURL}")
 public class RecommendationController {
-    @Autowired
-    private EmotionAnalysisService emotionAnalysisService;
+    private static final Logger logger = Logger.getLogger(RecommendationController.class.getName());
 
     @Autowired
-    private ProductService productService;
+    private RecommendationService recommendationService;
 
-    @PostMapping("/emotional")
-    public ResponseEntity<ApiResponseDTO<List<ProductDTO>>> getRecommendationByEmotion(@RequestBody PromptDTO promptDTO) {
+    @PostMapping("/recommend")
+    public ResponseEntity<ApiResponseDTO<List<ProductDTO>>> getRecommendation(@RequestBody PromptDTO promptDTO) {
+        logger.info("Received request with prompt: " + promptDTO);
 
-        if(promptDTO.text == null || promptDTO.text.isEmpty()) {
+        if (promptDTO.getText() == null || promptDTO.getText().isEmpty() || promptDTO.getType() == null) {
+            logger.warning("Invalid request: Text or Type is empty");
             return ResponseEntity.badRequest().body(new ApiResponseDTO<>("Text cannot be empty", null));
         }
 
-        String emotion = emotionAnalysisService.getEmotion(promptDTO.text);
-
-        if(emotion == null) {
-            return ResponseEntity.badRequest().body(new ApiResponseDTO<>("Error: Emotion not found", null));
+        List<ProductDTO> products = recommendationService.getRecommendations(promptDTO.getType(), promptDTO.getText());
+        if (products == null || products.isEmpty()) {
+            logger.warning("No recommendations found");
+            return ResponseEntity.noContent().build();
         }
 
-        List<ProductDTO> products = productService.getAllByEmotion(emotion);
-
+        logger.info("Recommendations successfully fetched");
         return ResponseEntity.ok(new ApiResponseDTO<>("Recommendations Successfully Fetched", products));
     }
-
-
 }

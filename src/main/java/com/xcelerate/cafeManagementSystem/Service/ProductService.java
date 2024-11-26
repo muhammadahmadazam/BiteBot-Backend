@@ -156,6 +156,29 @@ public class ProductService {
             return false;
         }
     }
+
+    public List<ProductDTO> getAllbyIds(List<Long> ids) {
+        if(ids == null || ids.isEmpty()){
+            return new ArrayList<>();
+        }
+        List<Product> products = productRepository.findAllById(ids);
+        return products.stream().map(product -> {
+            // Map Product to ProductDTO
+            ProductDTO productDTO = new ProductDTO();
+            productDTO.setId(product.getId());
+            productDTO.setName(product.getName());
+            productDTO.setDescription(product.getDescription());
+            productDTO.setAvailability(product.isAvailability());
+            productDTO.setPrice(product.getPrice());
+            productDTO.setCategory(product.getCategory());
+            productDTO.setImageLink(product.getImageLink());
+            productDTO.setEmotion(product.getEmotion());
+            productDTO.setIngredients(product.getIngredients().stream()
+                    .map(ingredient -> new ProductDTO.IngredientDTO(ingredient.getId(), ingredient.getName()))
+                    .collect(Collectors.toSet()));
+            return productDTO;
+        }).collect(Collectors.toList());
+    }
 }
 
 

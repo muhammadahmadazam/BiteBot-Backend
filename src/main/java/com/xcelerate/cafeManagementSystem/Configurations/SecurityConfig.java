@@ -37,7 +37,7 @@ public class SecurityConfig {
                 .cors()
                 .and()
                 .authorizeHttpRequests()
-                .requestMatchers("/api/auth/**","/api/register/**", "/api/products/get/**" )
+                .requestMatchers("/api/auth/**","/api/register/**", "/api/products/get/**", "/api/recommendation/**" )
                 .permitAll()
                 .requestMatchers( "/api/order/**", "/api/orders/**")
                 .hasAnyRole("CUSTOMER", "WORKER")
