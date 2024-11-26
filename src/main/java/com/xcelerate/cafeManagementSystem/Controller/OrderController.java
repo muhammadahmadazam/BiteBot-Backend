@@ -318,7 +318,7 @@ public class OrderController {
             apiResponse.message = "You are not authorized to change order status.";
             return new ResponseEntity<>(apiResponse, HttpStatus.UNAUTHORIZED);
         }else{
-            boolean orderStatusUpdated =  orderService.deliverFailed(orderUpdateDto.getOrderId());
+            boolean orderStatusUpdated =  orderService.deliverFailed(orderUpdateDto.getOrderId(), orderUpdateDto.getReason(), w.getId());
             if (orderStatusUpdated) {
                 ApiResponseDTO<String> apiResponse = new ApiResponseDTO<String>();
                 apiResponse.message = "Order Status updated successfully.";
