@@ -28,6 +28,15 @@ public class ProductsController {
         }
     }
 
+
+    @PostMapping("/product/update")
+    public ResponseEntity<String> updateProduct(@RequestBody Product p) {
+        return new ResponseEntity<>("Product updated successfully.", HttpStatus.OK);
+    }
+
+    @PostMapping("/")
+
+
     @GetMapping("/products/get/all")
     public ResponseEntity<List<ProductDTO>> getAllProducts() {
         List<ProductDTO> products = productService.getAllProducts();

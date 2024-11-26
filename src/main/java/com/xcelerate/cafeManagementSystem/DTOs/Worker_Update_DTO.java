@@ -2,7 +2,10 @@ package com.xcelerate.cafeManagementSystem.DTOs;
 
 import jakarta.validation.constraints.NotNull;
 
-public class Worker_Create_DTO {
+public class Worker_Update_DTO {
+
+    @NotNull
+    public long workerId;
     @NotNull
     public String email;
     @NotNull
@@ -12,6 +15,14 @@ public class Worker_Create_DTO {
     @NotNull
     public String position;
 
+    @NotNull
+    public long getWorkerId() {
+        return workerId;
+    }
+
+    public void setWorkerId(@NotNull long workerId) {
+        this.workerId = workerId;
+    }
 
     public @NotNull String getEmail() {
         return email;

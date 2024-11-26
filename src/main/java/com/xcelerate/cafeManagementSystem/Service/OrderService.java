@@ -64,6 +64,58 @@ public class OrderService {
     }
 
 
+    @Transactional
+    public boolean confirmOrder(long customerId) {
+        Optional<Order> order = orderRepository.findFirstByCustomerIdAndStatusOrderByOrderDateDesc(customerId, "UNCONFIRMED");
+        if (order.isPresent()) {
+            Order o = order.get();
+            o.setStatus("PROCESSING");
+            orderRepository.save(o);
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    @Transactional
+    public boolean prepareOrder(String orderId) {
+        Optional<Order> o = orderRepository.findById(orderId);
+        if (o.isPresent()) {
+            Order order = o.get();
+            order.setStatus("PREPARING");
+            orderRepository.save(order);
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    @Transactional
+    public boolean completeOrder(String orderId) {
+        Optional<Order> o = orderRepository.findById(orderId);
+        if (o.isPresent()) {
+            Order order = o.get();
+            order.setStatus("COMPLETED");
+            orderRepository.save(order);
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    @Transactional
+    public List<Order> getCompleteOrders() {
+        return orderRepository.findByStatusWithSaleLineItems("COMPLETED");
+    }
+    @Transactional
+    public List<Order> getQueuedOrders() {
+        return orderRepository.findByStatusWithSaleLineItems("PROCESSING");
+    }
+
+    @Transactional
+    public List<Order> getPreparingOrders() {
+        return orderRepository.findByStatusWithSaleLineItems("PREPARING");
+    }
     public Map<String, Long> getOrderCountBySector(){
         List<Object[]> sectorCount = orderRepository.countOrdersBySector();
         Map<String, Long> sectorCountMap = new HashMap<>();

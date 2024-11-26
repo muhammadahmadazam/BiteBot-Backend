@@ -20,6 +20,8 @@ public class AuthenticationController {
     public ResponseEntity<ApiResponseDTO<String>> loginUser(
             @RequestBody LoginDTO loginDTO
     ) {
+        System.out.println(loginDTO.email);
+        System.out.println(loginDTO.password);
 
         String email = loginDTO.email;
         String password = loginDTO.password;

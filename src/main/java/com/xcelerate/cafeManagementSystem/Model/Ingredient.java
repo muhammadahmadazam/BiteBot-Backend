@@ -1,6 +1,8 @@
 package com.xcelerate.cafeManagementSystem.Model;
 import java.util.HashSet;
 import java.util.Set;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 @Entity
@@ -14,6 +16,7 @@ public class Ingredient {
         private String name;
 
         @ManyToMany(mappedBy = "ingredients")
+        @JsonIgnore
         private Set<Product> products = new HashSet<>();
 
 

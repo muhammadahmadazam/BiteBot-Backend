@@ -1,6 +1,7 @@
 package com.xcelerate.cafeManagementSystem.Model;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 @Entity
@@ -21,6 +22,7 @@ public class SalesLineItem {
 
     @ManyToOne
     @JoinColumn(name = "order_id", nullable = false)
+    @JsonIgnore
     private Order order;
 
 

@@ -1,18 +1,8 @@
 package com.xcelerate.cafeManagementSystem.Controller;
 
 import com.xcelerate.cafeManagementSystem.DTOs.*;
-import com.xcelerate.cafeManagementSystem.Model.Customer;
-import com.xcelerate.cafeManagementSystem.Model.Order;
-import com.xcelerate.cafeManagementSystem.Model.Product;
-import com.xcelerate.cafeManagementSystem.Model.SalesLineItem;
-import com.xcelerate.cafeManagementSystem.Service.CustomerService;
-import com.xcelerate.cafeManagementSystem.Service.OrderService;
-import com.xcelerate.cafeManagementSystem.Service.OtpService;
-import com.xcelerate.cafeManagementSystem.Service.ProductService;
-import com.xcelerate.cafeManagementSystem.Utils.JwtUtil;
-import org.apache.hc.client5.http.auth.BearerToken;
-import org.aspectj.weaver.ast.Or;
-import org.springframework.boot.autoconfigure.security.oauth2.resource.OAuth2ResourceServerProperties;
+import com.xcelerate.cafeManagementSystem.Model.*;
+import com.xcelerate.cafeManagementSystem.Service.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -23,25 +13,24 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 
-//import org.springframework.security.oauth2.jwt.Jwt;
+
 @Controller
 @CrossOrigin(origins = "${frontendURL}")
 @RequestMapping("/api/")
 public class OrderController {
 
-
-
     private final OrderService orderService;
     private final ProductService productService;
     private final CustomerService customerService;
     private final OtpService otpService;
+    private final WorkerService workerService;
 
-    public OrderController(OrderService orderService, ProductService productService, CustomerService customerService, OtpService otpService) {
-
+    public OrderController(OrderService orderService, ProductService productService, CustomerService customerService, OtpService otpService, WorkerService workerService) {
         this.orderService = orderService;
         this.productService = productService;
         this.customerService = customerService;
         this.otpService = otpService;
+        this.workerService = workerService;
     }
 
     @PostMapping ("/order/create")
@@ -96,7 +85,6 @@ public class OrderController {
         }
     }
 
-
     @PostMapping("/order/confirm")
     public ResponseEntity<ApiResponseDTO<String>> placeOrder(@RequestBody otpDTO otp) {
         Authentication auth =  SecurityContextHolder.getContext().getAuthentication();
@@ -109,16 +97,25 @@ public class OrderController {
             return new ResponseEntity<ApiResponseDTO<String>>(apiResponseDTO, HttpStatus.BAD_REQUEST);
         }
 
+        System.out.println("Validating OTP...");
         if (otpService.validateOtp(email, otp.otp)) {
+            System.out.println("Validated OTP");
             ApiResponseDTO<String> response = new ApiResponseDTO<>("Order confirmed successfully", email);
-            return new ResponseEntity<>(response, HttpStatus.OK);
+            System.out.println("Confirming order using customer id: " + c.getId());
+            if (orderService.confirmOrder(c.getId())){
+                System.out.println("Order Status Updated");
+                return new ResponseEntity<>(response, HttpStatus.OK);
+            }else{
+                System.out.println("Order Status not updated");
+                response.message = "Order confirmation failed";
+                return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+            }
         }else{
             ApiResponseDTO<String> responseDTO = new ApiResponseDTO<>();
             responseDTO.message = "OTP verification failed";
             return new ResponseEntity<>(responseDTO, HttpStatus.BAD_REQUEST);
         }
     }
-
 
     @PostMapping("/order/resendOTP")
     public ResponseEntity<ApiResponseDTO<String>>  resendOTP() {
@@ -170,7 +167,6 @@ public class OrderController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-
     @GetMapping("/orders/get-by-customer")
     public ResponseEntity<ApiResponseDTO<List<PastOrderDTO>>> getPastOrders(){
         Authentication auth =  SecurityContextHolder.getContext().getAuthentication();
@@ -201,14 +197,100 @@ public class OrderController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @GetMapping("/orders/get-processing-and-prepared")
+    public ResponseEntity<ApiResponseDTO<Order_Worker_DTO>> getProcessingOrders(){
+        Authentication auth =  SecurityContextHolder.getContext().getAuthentication();
+        String email = auth.getName();
+        Worker w = workerService.findByEmail(email);
+        if (w == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }else{
+
+            List<Order> orders=  orderService.getQueuedOrders();
+            List<Order_DeliveryDTO> processingDTO = orders.stream().map(Order_DeliveryDTO::new).toList();
+
+            List<Order> preparingOrders =  orderService.getPreparingOrders();
+            List<Order_DeliveryDTO> preparingDTO = preparingOrders.stream().map(Order_DeliveryDTO::new).toList();
+
+            Order_Worker_DTO orderWorkerDto = new Order_Worker_DTO();
+            orderWorkerDto.processing=processingDTO;
+            orderWorkerDto.preparing=preparingDTO;
+
+            ApiResponseDTO<Order_Worker_DTO> apiResponseDTO = new ApiResponseDTO<>();
+            apiResponseDTO.message = "Successfully fetched processing orders.";
+            apiResponseDTO.data = orderWorkerDto;
+
+            return new ResponseEntity<>(apiResponseDTO, HttpStatus.OK);
+        }
+    }
 
     @PostMapping("/order/prepare")
-    public ResponseEntity<Worker_Response_DTO> prepareOrder(@RequestBody String orderId) {
+    public ResponseEntity<ApiResponseDTO<String>> prepareOrder(@RequestBody Order_Update_DTO orderUpdateDto) {
+        Authentication auth =  SecurityContextHolder.getContext().getAuthentication();
+        String email = auth.getName();
+        Worker w = workerService.findByEmail(email);
+        if (w == null) {
+            ApiResponseDTO<String> apiResponse = new ApiResponseDTO<String>();
+            apiResponse.message = "You are not authorized to change order status.";
+            return new ResponseEntity<>(apiResponse, HttpStatus.UNAUTHORIZED);
+        }else{
+            boolean orderStatusUpdated =  orderService.prepareOrder(orderUpdateDto.getOrderId());
+            if (orderStatusUpdated) {
+                ApiResponseDTO<String> apiResponse = new ApiResponseDTO<String>();
+                apiResponse.message = "Sucessfully updated order status";
+                apiResponse.data = "UPDATE_SUCCESSFUL";
+                return new ResponseEntity<>(apiResponse, HttpStatus.OK);
+            }else{
+                ApiResponseDTO<String> apiResponse = new ApiResponseDTO<String>();
+                apiResponse.message = "Order Status not updated successfully.";
+                return new ResponseEntity<>(apiResponse, HttpStatus.BAD_REQUEST);
+            }
+        }
 
     }
 
+    @PostMapping("/order/complete")
+    public ResponseEntity<ApiResponseDTO<String>> completeOrder(@RequestBody Order_Update_DTO orderUpdateDto) {
+        Authentication auth =  SecurityContextHolder.getContext().getAuthentication();
+        String email = auth.getName();
+        Worker w = workerService.findByEmail(email);
+        if (w == null) {
+            ApiResponseDTO<String> apiResponse = new ApiResponseDTO<String>();
+            apiResponse.message = "You are not authorized to change order status.";
+            return new ResponseEntity<>(apiResponse, HttpStatus.UNAUTHORIZED);
+        }else{
+            boolean orderStatusUpdated =  orderService.completeOrder(orderUpdateDto.getOrderId());
+            if (orderStatusUpdated) {
+                ApiResponseDTO<String> apiResponse = new ApiResponseDTO<String>();
+                apiResponse.message = "Order Status updated successfully.";
+                apiResponse.data = "ORDER_COMPLETED";
+                return new ResponseEntity<>(apiResponse, HttpStatus.OK);
+            }else{
+                ApiResponseDTO<String> apiResponse = new ApiResponseDTO<String>();
+                apiResponse.message = "Order Status not updated successfully.";
+                return new ResponseEntity<>(apiResponse, HttpStatus.BAD_REQUEST);
+            }
+        }
+
+    }
+
+    @PostMapping("/orders/get-prepared-orders")
+    public ResponseEntity<ApiResponseDTO<List<Order_DeliveryDTO>>> getUndeliveredOrders() {
+        Authentication auth =  SecurityContextHolder.getContext().getAuthentication();
+        String email = auth.getName();
+        Worker w = workerService.findByEmail(email);
+        if (w == null) {
+            ApiResponseDTO<List<Order_DeliveryDTO>> apiResponseDTO = new ApiResponseDTO<>();
+            apiResponseDTO.message = "You are not authorized to change order status.";
+            return new ResponseEntity<>(apiResponseDTO, HttpStatus.UNAUTHORIZED);
+        }else{
+             List<Order> orders=  orderService.getCompleteOrders();
+             ApiResponseDTO<List<Order_DeliveryDTO>> apiResponseDTO = new ApiResponseDTO<>();
+             List<Order_DeliveryDTO> deliveryDTO = orders.stream().map(Order_DeliveryDTO::new).toList();
+             apiResponseDTO.message = "Successfully fetched orders to be delivered.";
+             apiResponseDTO.data = deliveryDTO;
+             return new ResponseEntity<>(apiResponseDTO, HttpStatus.OK);
+        }
+    }
 
 }
-
-
-

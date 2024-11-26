@@ -12,7 +12,7 @@ public class ProductDTO {
     protected String imageLink;
     protected String description;
     private Set<IngredientDTO> ingredients;
-
+    private String type;
     // Getters and setters
 
     public long getId() {
@@ -77,6 +77,14 @@ public class ProductDTO {
 
     public void setIngredients(Set<IngredientDTO> ingredients) {
         this.ingredients = ingredients;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 
     public static class IngredientDTO {

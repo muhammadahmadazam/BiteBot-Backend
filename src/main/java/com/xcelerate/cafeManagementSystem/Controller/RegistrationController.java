@@ -1,13 +1,13 @@
 package com.xcelerate.cafeManagementSystem.Controller;
 
 import com.cloudinary.Api;
-import com.xcelerate.cafeManagementSystem.DTOs.ApiResponseDTO;
-import com.xcelerate.cafeManagementSystem.DTOs.CustomerRegistrationDTO;
-import com.xcelerate.cafeManagementSystem.DTOs.CustomerVerificationDTO;
-import com.xcelerate.cafeManagementSystem.DTOs.EmailDTO;
+import com.xcelerate.cafeManagementSystem.DTOs.*;
+import com.xcelerate.cafeManagementSystem.Model.Admin;
+import com.xcelerate.cafeManagementSystem.Service.AdminService;
 import com.xcelerate.cafeManagementSystem.Service.CustomerService;
 import com.xcelerate.cafeManagementSystem.Service.OtpService;
 import com.xcelerate.cafeManagementSystem.Utils.EmailUtil;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -16,7 +16,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.concurrent.CompletableFuture;
-
+import com.xcelerate.cafeManagementSystem.DTOs.Admin_Response_DTO;
 @RestController
 @CrossOrigin(origins = "${frontendURL}")
 @RequestMapping("/api/register")
@@ -27,6 +27,8 @@ public class RegistrationController {
 
     @Autowired
     private OtpService otpService;
+    @Autowired
+    private AdminService adminService;
 
     @PostMapping("/create-account")
     public ResponseEntity<ApiResponseDTO<String>> registerUser(
@@ -101,5 +103,19 @@ public class RegistrationController {
         }
         ApiResponseDTO<String> response = new ApiResponseDTO<>("Error in sending OTP", email);
         return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+
+    @PostMapping("/admin")
+    public ResponseEntity<Admin_Response_DTO> registerAdmin(@RequestBody @Valid Admin_Create_DTO adminDTO) {
+        System.out.println(adminDTO.getName());
+        Admin admin = adminService.createAdmin(adminDTO);
+        if (admin == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }else{
+            Admin_Response_DTO adminResponseDto = new Admin_Response_DTO(admin);
+            return new ResponseEntity<Admin_Response_DTO>(adminResponseDto, HttpStatus.OK);
+        }
+
     }
 }
