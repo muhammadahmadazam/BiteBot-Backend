@@ -221,4 +221,8 @@ public class OrderService {
         return orderCountBySector;
     }
 
+    public Order findByOrderId(String orderId) {
+        return orderRepository.findByOrderId(orderId);
+    }
+
 }

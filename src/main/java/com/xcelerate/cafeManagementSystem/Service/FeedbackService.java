@@ -19,14 +19,12 @@ public class FeedbackService {
     @Autowired
     private FeedbackRepository feedbackRepository;
 
-    @Autowired
-    private OrderRepository orderRepository;
+
 
     @Transactional
-    public Feedback createFeedback(String content, String order_id) {
+    public Feedback createFeedback(String content, Order order) {
         Feedback feedback = new Feedback();
         feedback.content = content;
-        Order order = orderRepository.findByOrderId(order_id);
         if(order == null) {
             return null;
         }

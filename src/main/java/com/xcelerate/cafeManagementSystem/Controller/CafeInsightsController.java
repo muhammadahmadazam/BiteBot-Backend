@@ -63,7 +63,7 @@ public class CafeInsightsController {
     }
 
     @GetMapping("/get-revenue")
-    public ResponseEntity<ApiResponseDTO<Map<String, Long>>> getDailyRevenueForLast30Days(
+    public ResponseEntity<ApiResponseDTO<Map<String, Long>>> getRevenue(
             @RequestParam(value = "startDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date startDate,
             @RequestParam(value = "endDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date endDate) {
         Map<String, Long> dailyRevenue;

@@ -4,10 +4,12 @@ package com.xcelerate.cafeManagementSystem.Controller;
 import com.xcelerate.cafeManagementSystem.DTOs.*;
 import com.xcelerate.cafeManagementSystem.Model.Customer;
 import com.xcelerate.cafeManagementSystem.Model.Feedback;
+import com.xcelerate.cafeManagementSystem.Model.Order;
 import com.xcelerate.cafeManagementSystem.Model.SalesLineItem;
 import com.xcelerate.cafeManagementSystem.Service.CustomerService;
 import com.xcelerate.cafeManagementSystem.Service.EmailService;
 import com.xcelerate.cafeManagementSystem.Service.FeedbackService;
+import com.xcelerate.cafeManagementSystem.Service.OrderService;
 import org.apache.http.protocol.HTTP;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -34,6 +36,9 @@ public class FeedbackController {
     @Autowired
     private EmailService emailService;
 
+    @Autowired
+    private OrderService orderService;
+
     @PostMapping("/order")
     public ResponseEntity<ApiResponseDTO<String>> createFeedback(@RequestBody CreateFeedbackDTO createFeedbackDTO) {
         String content = createFeedbackDTO.content;
@@ -41,7 +46,11 @@ public class FeedbackController {
         if (content == null || order_id == null) {
             return new ResponseEntity<>(new ApiResponseDTO<>("Invalid request", null), HttpStatus.BAD_REQUEST);
         }
-        Feedback feedback = feedbackService.createFeedback(content, order_id);
+        Order order = orderService.findByOrderId(order_id);
+        if (order == null) {
+            return new ResponseEntity<>(new ApiResponseDTO<>("Invalid order id", null), HttpStatus.BAD_REQUEST);
+        }
+        Feedback feedback = feedbackService.createFeedback(content, order);
         if (feedback != null) {
             ApiResponseDTO<String> response = new ApiResponseDTO<>("Feedback created", "Feedback id: " + feedback.feedback_id);
             return new ResponseEntity<>(response, HttpStatus.OK);
