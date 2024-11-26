@@ -9,6 +9,7 @@ import com.xcelerate.cafeManagementSystem.Utils.EmailUtil;
 import com.xcelerate.cafeManagementSystem.Utils.PasswordUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -33,6 +34,7 @@ public class CustomerService {
     * @param phone
     * @return the customer object
      */
+    @Transactional(rollbackFor = Exception.class)
     public Customer createUser(String email, String password, String name, String phone) {
 
         if(email.isEmpty() || password.isEmpty() || name.isEmpty()  || phone.isEmpty()) {
@@ -80,12 +82,13 @@ public class CustomerService {
     }
 
 
-
+    @Transactional(rollbackFor = Exception.class)
     public Customer getCustomerByEmail(String email) {
         Optional<Customer> customer = customerRepository.findByEmailIgnoreCase(email);
         return customer.orElse(null);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public Customer getCustomerById(long id) {
         Optional<Customer> customer = customerRepository.findById(id);
         return customer.orElse(null);

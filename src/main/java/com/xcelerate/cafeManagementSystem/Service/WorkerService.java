@@ -25,6 +25,7 @@ public class WorkerService {
         this.workerRepository = workerRepository;
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public Worker createWorker(Worker_Create_DTO workerDTO) {
         Worker worker = null;
         if (workerDTO.type.equals("DELIVERY_MAN")) {
@@ -44,6 +45,7 @@ public class WorkerService {
         return workerRepository.save(worker);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public boolean existsById(long workerId) {
         Worker worker = workerRepository.findById(workerId).orElse(null);
         if (worker == null) {
@@ -54,16 +56,18 @@ public class WorkerService {
         }
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public Worker findByEmail(String email) {
         Optional<Worker> w =  workerRepository.findByEmail(email);
         return w.orElse(null);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public List<Worker> getAllWorkers() {
         return workerRepository.findAll();
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public boolean deleteWorker(long workerId) {
         Worker w = workerRepository.findById(workerId).orElse(null);
         if (w != null) {
@@ -74,7 +78,7 @@ public class WorkerService {
         }
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public boolean updateWorker(Worker_Update_DTO workerDTO) {
         Worker w = workerRepository.findById(workerDTO.getWorkerId()).orElse(null);
         if (w != null) {

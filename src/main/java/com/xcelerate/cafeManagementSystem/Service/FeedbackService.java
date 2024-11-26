@@ -21,7 +21,7 @@ public class FeedbackService {
 
 
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public Feedback createFeedback(String content, Order order) {
         Feedback feedback = new Feedback();
         feedback.content = content;

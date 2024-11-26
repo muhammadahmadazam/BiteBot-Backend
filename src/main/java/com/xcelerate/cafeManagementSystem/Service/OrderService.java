@@ -42,7 +42,7 @@ public class OrderService {
         this.emailService = emailService;
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public boolean createOrder(Order order) {
 
         /*  SAVING ORDER IF THE CUSTOMER EXISTS */
@@ -74,7 +74,7 @@ public class OrderService {
     }
 
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public boolean confirmOrder(long customerId) {
         Optional<Order> order = orderRepository.findFirstByCustomerIdAndStatusOrderByOrderDateDesc(customerId, "UNCONFIRMED");
         if (order.isPresent()) {
@@ -87,7 +87,7 @@ public class OrderService {
         }
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public boolean prepareOrder(String orderId) {
         Optional<Order> o = orderRepository.findById(orderId);
         if (o.isPresent()) {
@@ -104,7 +104,7 @@ public class OrderService {
         }
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public boolean completeOrder(String orderId) {
         Optional<Order> o = orderRepository.findById(orderId);
         if (o.isPresent()) {
@@ -121,7 +121,7 @@ public class OrderService {
         }
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public boolean deliverOrder(String orderId) {
         Optional<Order> o = orderRepository.findById(orderId);
         if (o.isPresent()) {
@@ -134,7 +134,7 @@ public class OrderService {
         }
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public boolean deliverFailed(String orderId, String reason, long workerId) {
         Optional<Order> o = orderRepository.findById(orderId);
         if (o.isPresent()) {
@@ -156,17 +156,17 @@ public class OrderService {
         }
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public List<Order> getCompleteOrders() {
         return orderRepository.findByStatusWithSaleLineItems("COMPLETED");
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public List<Order> getQueuedOrders() {
         return orderRepository.findByStatusWithSaleLineItems("PROCESSING");
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public List<Order> getPreparingOrders() {
         return orderRepository.findByStatusWithSaleLineItems("PREPARING");
     }
@@ -182,6 +182,7 @@ public class OrderService {
         return sectorCountMap;
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public Map<String, Long> getTopSoldItems() {
         List<Object[]> results = salesLineItemRepository.countTopSoldItems();
         Map<String, Long> topSoldItems = new HashMap<>();
@@ -191,6 +192,7 @@ public class OrderService {
         return topSoldItems;
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public Map<Integer, Long> getTopBusinessHours() {
         List<Object[]> results = orderRepository.countOrdersByHour();
         Map<Integer, Long> orderCountByHour = new HashMap<>();
@@ -200,6 +202,7 @@ public class OrderService {
         return orderCountByHour;
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public Map<String, Long> getDailyRevenueForLast30Days() {
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.DAY_OF_MONTH, -30);
@@ -226,6 +229,7 @@ public class OrderService {
         return dailyRevenue;
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public Map<String, Long> getDailyRevenueBetweenDates(Date startDate, Date endDate) {
         logger.info("Fetching daily revenue between: " + startDate + " and " + endDate);
         List<Object[]> results = null;
@@ -247,6 +251,7 @@ public class OrderService {
         return dailyRevenue;
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public Map<Integer, Long> getTopBusinessHoursBetweenDates(Date startDate, Date endDate) {
         List<Object[]> results = orderRepository.countOrdersByHourBetweenDates(startDate, endDate);
         Map<Integer, Long> orderCountByHour = new HashMap<>();
@@ -256,6 +261,7 @@ public class OrderService {
         return orderCountByHour;
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public Map<String, Long> getTopSoldItemsBetweenDates(Date startDate, Date endDate) {
         List<Object[]> results = salesLineItemRepository.countTopSoldItemsBetweenDates(startDate, endDate);
         Map<String, Long> topSoldItems = new HashMap<>();
@@ -265,6 +271,7 @@ public class OrderService {
         return topSoldItems;
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public Map<String, Long> getOrderCountBySectorBetweenDates(Date startDate, Date endDate) {
         List<Object[]> results = orderRepository.countOrdersBySectorBetweenDates(startDate, endDate);
         Map<String, Long> orderCountBySector = new HashMap<>();
@@ -276,6 +283,7 @@ public class OrderService {
         return orderCountBySector;
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public Order findByOrderId(String orderId) {
         return orderRepository.findByOrderId(orderId);
     }

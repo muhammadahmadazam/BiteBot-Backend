@@ -62,6 +62,7 @@ public class ProductService {
         }
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public List<ProductDTO> getAllProducts() {
 
         List<Product> products = productRepository.findAll();
@@ -85,6 +86,7 @@ public class ProductService {
 
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public List<ProductDTO> getAllByEmotion(String emotion) {
         List<Product> products = productRepository.getAllByEmotion(emotion);
         return products.stream().map(product -> {
@@ -110,6 +112,7 @@ public class ProductService {
         return p.orElse(null);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public ProductDTO getByProductById(long id) {
         Optional<Product> product = productRepository.findByIdWithIngredients((int)id);
 
@@ -132,7 +135,7 @@ public class ProductService {
     }
 
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public boolean updateProduct(Product p) {
         Product orgProduct = productRepository.findById(p.getId()).orElse(null);
         if (orgProduct != null) {
@@ -150,6 +153,7 @@ public class ProductService {
         }
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public boolean deleteById(long id) {
         Product p = productRepository.findById(id).orElse(null);
         if (p != null) {
@@ -160,6 +164,7 @@ public class ProductService {
         }
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public List<ProductDTO> getAllbyIds(List<Long> ids) {
         if(ids == null || ids.isEmpty()){
             return new ArrayList<>();

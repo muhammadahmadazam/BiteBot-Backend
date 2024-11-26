@@ -7,6 +7,7 @@ import com.xcelerate.cafeManagementSystem.Utils.PasswordUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class AdminService {
@@ -19,6 +20,7 @@ public class AdminService {
         this.adminRepository = adminRepository;
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public Admin createAdmin(Admin_Create_DTO adminDTO) {
         if (adminDTO.getCafeSecretKey().equals(cafeSecretkey)) {
             Admin admin = new Admin();

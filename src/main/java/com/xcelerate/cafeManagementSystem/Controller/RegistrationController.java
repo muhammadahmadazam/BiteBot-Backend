@@ -3,6 +3,7 @@ package com.xcelerate.cafeManagementSystem.Controller;
 import com.cloudinary.Api;
 import com.xcelerate.cafeManagementSystem.DTOs.*;
 import com.xcelerate.cafeManagementSystem.Model.Admin;
+import com.xcelerate.cafeManagementSystem.Model.Customer;
 import com.xcelerate.cafeManagementSystem.Service.AdminService;
 import com.xcelerate.cafeManagementSystem.Service.CustomerService;
 import com.xcelerate.cafeManagementSystem.Service.OtpService;
@@ -42,8 +43,14 @@ public class RegistrationController {
         String phone = customerRegistrationDTO.phone;
 
 
+        Customer c = customerService.createUser(email, password, name, phone);
+
+        if(c == null) {
+            ApiResponseDTO<String> response = new ApiResponseDTO<>("Invalid input", email);
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        }
+
         // Generate Non Verified User and send OTP
-        customerService.createUser(email, password, name, phone);
         boolean isOtpSent = otpService.generateAndSendOtp(email);
 
 
