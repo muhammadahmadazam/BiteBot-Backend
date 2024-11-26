@@ -1,10 +1,15 @@
 package com.xcelerate.cafeManagementSystem.Controller;
 
 
+import com.cloudinary.api.ApiResponse;
+import com.xcelerate.cafeManagementSystem.DTOs.ApiResponseDTO;
 import com.xcelerate.cafeManagementSystem.DTOs.ProductDTO;
+import com.xcelerate.cafeManagementSystem.DTOs.Product_Delete_DTO;
 import com.xcelerate.cafeManagementSystem.Model.Product;
 import com.xcelerate.cafeManagementSystem.Service.ProductService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -30,12 +35,32 @@ public class ProductsController {
 
 
     @PostMapping("/product/update")
-    public ResponseEntity<String> updateProduct(@RequestBody Product p) {
-        return new ResponseEntity<>("Product updated successfully.", HttpStatus.OK);
+    public ResponseEntity<ApiResponseDTO<String>> updateProduct(@RequestBody @Valid Product p) {
+        ApiResponseDTO<String> responseDTO = new ApiResponseDTO<>();
+        if (productService.updateProduct(p)) {
+            responseDTO.message = "Product updated successfully.";
+            responseDTO.data = "PRODUCT_UPDATED";
+            return new ResponseEntity<>(responseDTO, HttpStatus.OK);
+        }else{
+            responseDTO.message = "ERROR: Unable to update product.";
+            return new ResponseEntity<>(responseDTO, HttpStatus.BAD_REQUEST);
+        }
     }
 
-    @PostMapping("/")
 
+    @PostMapping("/product/delete")
+    public ResponseEntity<ApiResponseDTO<String>> deleteProduct(@RequestBody @Valid Product_Delete_DTO p) {
+        ApiResponseDTO<String> response = new ApiResponseDTO<>();
+        if (productService.deleteById(p.getProductId())){
+            response.message = "Product deleted successfully.";
+            response.data = "PRODUCT_DELETED";
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }else{
+            response.message = "Failed to delete product.";
+            response.data = "";
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        }
+    }
 
     @GetMapping("/products/get/all")
     public ResponseEntity<List<ProductDTO>> getAllProducts() {

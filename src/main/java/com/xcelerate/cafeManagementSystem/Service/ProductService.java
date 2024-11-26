@@ -1,6 +1,7 @@
 package com.xcelerate.cafeManagementSystem.Service;
 
 import com.xcelerate.cafeManagementSystem.DTOs.ProductDTO;
+import com.xcelerate.cafeManagementSystem.DTOs.Product_Delete_DTO;
 import com.xcelerate.cafeManagementSystem.Model.Ingredient;
 import com.xcelerate.cafeManagementSystem.Model.Product;
 import com.xcelerate.cafeManagementSystem.Repository.IngredientRepository;
@@ -72,7 +73,7 @@ public class ProductService {
             productDTO.setPrice(product.getPrice());
             productDTO.setCategory(product.getCategory());
             productDTO.setImageLink(product.getImageLink());
-
+            productDTO.setEmotion(product.getEmotion());
             productDTO.setIngredients(product.getIngredients().stream()
                     .map(ingredient -> new ProductDTO.IngredientDTO(ingredient.getId(), ingredient.getName()))
                     .collect(Collectors.toSet()));
@@ -124,6 +125,35 @@ public class ProductService {
             return productDTO;
         }else{
             return null;
+        }
+    }
+
+
+    @Transactional
+    public boolean updateProduct(Product p) {
+        Product orgProduct = productRepository.findById(p.getId()).orElse(null);
+        if (orgProduct != null) {
+            orgProduct.setName(p.getName());
+            orgProduct.setDescription(p.getDescription());
+            orgProduct.setAvailability(p.isAvailability());
+            orgProduct.setPrice(p.getPrice());
+            orgProduct.setCategory(p.getCategory());
+            orgProduct.setImageLink(p.getImageLink());
+            orgProduct.setEmotion(p.getEmotion());
+            productRepository.save(orgProduct);
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    public boolean deleteById(long id) {
+        Product p = productRepository.findById(id).orElse(null);
+        if (p != null) {
+            productRepository.delete(p);
+            return true;
+        }else{
+            return false;
         }
     }
 }

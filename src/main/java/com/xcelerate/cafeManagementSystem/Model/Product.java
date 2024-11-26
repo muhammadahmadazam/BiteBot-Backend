@@ -102,5 +102,11 @@ public class Product {
         this.ingredients = ingredients;
     }
 
+    public String getEmotion() {
+        return emotion;
+    }
 
+    public void setEmotion(String emotion) {
+        this.emotion = emotion;
+    }
 }
