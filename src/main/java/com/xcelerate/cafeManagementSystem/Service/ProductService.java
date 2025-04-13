@@ -1,18 +1,27 @@
 package com.xcelerate.cafeManagementSystem.Service;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.reflect.TypeToken;
 import com.xcelerate.cafeManagementSystem.DTOs.ProductDTO;
 import com.xcelerate.cafeManagementSystem.DTOs.Product_Delete_DTO;
 import com.xcelerate.cafeManagementSystem.Model.Ingredient;
 import com.xcelerate.cafeManagementSystem.Model.Product;
 import com.xcelerate.cafeManagementSystem.Repository.IngredientRepository;
 import com.xcelerate.cafeManagementSystem.Repository.ProductRepository;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.annotation.Transactional;import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.lang.reflect.Type;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Service
@@ -20,6 +29,16 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final IngredientRepository ingredientRepository;
 
+
+    private final OkHttpClient client = new OkHttpClient.Builder()
+            .connectTimeout(30, TimeUnit.SECONDS)  // Timeout for establishing connection
+            .readTimeout(30, TimeUnit.SECONDS)     // Timeout for reading response
+            .writeTimeout(30, TimeUnit.SECONDS)    // Timeout for writing request
+            .build();
+    private final Gson gson = new Gson(); // Reuse a single Gson instance
+
+    @Value("${chatApiURL}")
+    private String chatApiURL;
 
     @Autowired
     public ProductService(ProductRepository productRepository, IngredientRepository ingredientRepository) {
@@ -54,12 +73,55 @@ public class ProductService {
             }
             p.setIngredients(new HashSet<>(Arrays.asList(newIngredients.toArray(new Ingredient[0]))));
 //            System.out.println("Ingredients are okay..");
-            productRepository.save(p);
+
+            Product savedProduct = productRepository.save(p);
+            System.out.println(savedProduct.getId());
+            System.out.println(savedProduct.getDescription());
+            System.out.println(savedProduct.getName());
+//            System.out.println(savedProduct.getId());
+
+            Map<String, Object> body = new HashMap<>();
+            body.put("item_id", savedProduct.getId());
+            body.put("name", savedProduct.getName());
+            body.put("description", savedProduct.getDescription());
+            // Convert ingredients to list of strings
+            List<String> ingredientNames = savedProduct.getIngredients().stream()
+                    .map(Ingredient::getName)
+                    .collect(Collectors.toList());
+            body.put("ingredients", ingredientNames);
+//            body.put("ingredients", savedProduct.getIngredients().stream().map(in -> in.getName()));
+
+            String jsonStr = gson.toJson(body);
+            okhttp3.RequestBody requestBody = RequestBody.create(jsonStr, okhttp3.MediaType.parse("application/json"));
+
+            Request request = new Request.Builder()
+                    .url(chatApiURL + "/items/add")
+                    .post(requestBody)
+                    .build();
+
+            try (okhttp3.Response response = client.newCall(request).execute()) {
+                if (response.isSuccessful() && response.body() != null) {
+                    System.out.println("Request successful: " + response.code());
+                    JsonObject jsonObject = gson.fromJson(response.body().string(), JsonObject.class);
+                    Type listType = new TypeToken<List<Long>>() {}.getType();
+//                    return gson.fromJson(jsonObject.get("response"), listType);
+                    return savedProduct;
+                } else {
+                    System.out.println("Request failed: " + response.code());
+                    productRepository.delete(savedProduct);
+                    throw new Exception("Failed to add product to vector store.");
+                }
+            } catch (IOException e) {
+                productRepository.delete(savedProduct);
+                e.printStackTrace();
+            }
+
             return p;
         }catch (Exception e) {
             System.out.println(e.getMessage());
             return null;
         }
+
     }
 
     @Transactional(rollbackFor = Exception.class)
